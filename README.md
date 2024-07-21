@@ -73,19 +73,43 @@
 
 ## 📺 화면 구성
 
-|  |  |
-| ---- | ---- |
-| 메인 페이지 |  |
-| ![홈 화면](readmeImg/index.png) | ![상품 목록](readmeImg/list.png) |
-| 관리자 |  |
-| ![관리자 대시보드](readmeImg/manager.png) | ![이상상품 판별 결과](readmeImg/modelpredict.png)  |
-| 상품  ||
-| ![상품 등록](readmeImg/productregister.png) | ![상품 디테일](readmeImg/detail.png)  |
-| 회원 |  |
-| ![회원정보](readmeImg/myinfo.png) | ![등록 상품 목록](readmeImg/myproduct.png)  |
-| 인콰이어리 |  |
-| ![인콰이어리 목록](readmeImg/inquiry.png) | ![인콰이어리 모달](readmeImg/inquirymodal.png)  |
-
+<table>
+  <tr>
+    <td colspan="2">메인 페이지</td>
+  </tr>
+  <tr>
+    <td><img src="readmeImg/index.png" alt="홈 화면"></td>
+    <td><img src="readmeImg/list.png" alt="상품 목록"></td>
+  </tr>
+  <tr>
+    <td colspan="2">관리자</td>
+  </tr>
+  <tr>
+    <td><img src="readmeImg/manager.png" alt="관리자 대시보드"></td>
+    <td><img src="readmeImg/modelpredict.png" alt="이상상품 판별 결과"></td>
+  </tr>
+  <tr>
+    <td colspan="2">상품</td>
+  </tr>
+  <tr>
+    <td><img src="readmeImg/productregister.png" alt="상품 등록"></td>
+    <td><img src="readmeImg/detail.png" alt="상품 디테일"></td>
+  </tr>
+  <tr>
+    <td colspan="2">회원</td>
+  </tr>
+  <tr>
+    <td><img src="readmeImg/myinfo.png" alt="회원정보"></td>
+    <td><img src="readmeImg/myproduct.png" alt="등록 상품 목록"></td>
+  </tr>
+  <tr>
+    <td colspan="2">인콰이어리</td>
+  </tr>
+  <tr>
+    <td><img src="readmeImg/inquiry.png" alt="인콰이어리 목록"></td>
+    <td><img src="readmeImg/inquirymodal.png" alt="인콰이어리 모달"></td>
+  </tr>
+</table>
 
 
 
