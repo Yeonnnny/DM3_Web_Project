@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "lstm.predict.server",
+  "type": "java.lang.String",
+  "description": "A description for 'lstm.predict.server'"
+}]}

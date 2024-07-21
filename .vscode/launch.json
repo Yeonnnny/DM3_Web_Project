@@ -1,0 +1,34 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-Spring7Application<spring7>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "net.kdigital.board.Spring7Application",
+            "projectName": "spring7",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-FinalTestApplication<finalTest>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "net.kdigital.market.FinalTestApplication",
+            "projectName": "finalTest",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-Ec21Application<ec21>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "net.kdigital.ec21.Ec21Application",
+            "projectName": "ec21",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" th:href="@{/production/images/ec21logo.png}">
+
+  <title>ec21 관리자 페이지</title>
+  <!-- Web Font -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link th:href="@{/vendors/bootstrap/dist/css/bootstrap.min.css}" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link th:href="@{/vendors/font-awesome/css/font-awesome.css}" rel="stylesheet">
+  <!-- NProgress -->
+  <link th:href="@{/vendors/nprogress/nprogress.css}" rel="stylesheet">
+  <!-- iCheck -->
+  <link th:href="@{/vendors/iCheck/skins/flat/green.css}" rel="stylesheet">
+
+  <!-- bootstrap-progressbar -->
+  <link th:href="@{/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css}" rel="stylesheet">
+  <!-- JQVMap -->
+  <link th:href="@{/vendors/jqvmap/dist/jqvmap.min.css}" rel="stylesheet">
+  <!-- bootstrap-daterangepicker -->
+  <link th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}" rel="stylesheet">
+
+  <!-- Custom Theme Style -->
+  <link th:href="@{/build/css/custom.css}" rel="stylesheet">
+  <script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+  <script>
+
+    $(document).ready(function () {
+      // 현재 날짜와 달의 첫 날짜를 계산합니다.
+      var currentDate = new Date();
+      var firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+
+      // ISO 문자열 대신에 로컬 날짜 포맷을 사용합니다.
+      function toLocalDateStr(date) {
+        return date.getFullYear() + '-' +
+          ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+          ('0' + date.getDate()).slice(-2);
+      }
+
+      // input 태그에 날짜를 설정합니다.
+      $('#startDate').val(toLocalDateStr(firstDayOfMonth));
+      $('#endDate').val(toLocalDateStr(currentDate));
+
+      // 페이지 로드 시 차트를 업데이트합니다.
+      updateCharts();
+
+      // 'Update Charts' 버튼에 이벤트 리스너를 설정합니다.
+      // 사용자가 버튼을 클릭하면 updateCharts 함수가 실행됩니다.
+      $('#startDate, #endDate').on('change', function () {
+        updateCharts();
+      });
+
+      loadProhibitedWords();
+      loadWeeklySummary();
+
+    });
+
+
+    function loadWeeklySummary() {
+      $.ajax({
+        url: "/manager/board/getRegistCustomerAndProuctCountsForFiveDays", // AJAX 요청을 보낼 서버의 URL 경로
+        type: "GET", // HTTP 요청 방식 (GET, POST)
+        dataType: "json", // 서버에서 보내줄 데이터의 타입
+        success: function (data) {
+          var tableBody = $("#weeklyRegSummaryTable");
+          tableBody.empty(); // 테이블의 기존 내용을 비우고
+          console.log(data);
+
+          // 받은 데이터로 새로운 행을 추가
+          data.forEach(function (item) {
+
+            var row = "<tr><td>" + item.date + "</td><td>" + item.productCnt + "</td><td>" + item.customerCnt + "</td></tr>";
+            tableBody.append(row);
+          });
+        },
+        error: function (error) {
+          console.error("Error loading data: ", error);
+        }
+      });
+    }
+
+    function loadProhibitedWords() {
+      $.ajax({
+        url: "/manager/board/topSimilarWordCounts", // 수정된 엔드포인트
+        type: "GET",
+        success: function (data) {
+          var tableBody = $("#similarWordsTable");
+          tableBody.empty(); // 기존의 데이터를 비우고 새로운 데이터로 채웁니다.
+          // 서버로부터 받은 데이터를 행으로 추가합니다.
+          data.forEach(function (item) {
+            var row = "<tr><td>" + item.similarWord + "</td><td>" + item.count + "</td></tr>";
+            tableBody.append(row);
+          });
+        },
+        error: function (error) {
+          console.log("Error fetching data:", error);
+        }
+      });
+
+    }
+
+    // 차트 인스턴스를 저장할 변수 선언
+    var lineChartInstance;
+    var doughnutChartInstance;
+
+    function updateCharts() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      if (!startDate || !endDate) {
+        alert("Please select both start and end dates.");
+        return;
+      }
+
+      // AJAX 요청을 보냅니다.
+      $.ajax({
+        url: "/manager/board/categoryProductCountByDateRange",
+        type: "GET",
+        data: {
+          startDate: startDate,
+          endDate: endDate
+        },
+        success: function (response) {
+          // 라인 차트 업데이트
+          updateLineChart(response);
+
+          // 도넛 차트 업데이트 (도넛 차트 업데이트 함수는 정의되어 있어야 합니다)
+          updateDoughnutChart(response);
+        },
+        error: function (xhr, status, error) {
+          console.error("Error fetching data:", xhr, status, error);
+        }
+      });
+    }
+
+    function updateLineChart(data) {
+      // 날짜별로 데이터를 집계
+      let dateCounts = data.reduce((acc, item) => {
+        let date = item.date.split('T')[0]; // ISO 문자열에서 날짜 부분만 가져옵니다.
+        acc[date] = (acc[date] || 0) + item.count;
+        return acc;
+      }, {});
+
+      // 날짜와 카운트를 배열로 변환
+      let dates = Object.keys(dateCounts).sort();
+      let counts = dates.map(date => dateCounts[date]);
+
+      // 차트 데이터 업데이트
+      const ctx = document.getElementById('lineChart').getContext('2d');
+      if (lineChartInstance) {
+        lineChartInstance.destroy(); // 기존 차트가 있다면 제거
+      }
+
+      var gradientFill = ctx.createLinearGradient(0, 0, 0, 300);
+      gradientFill.addColorStop(0, "rgba(128, 182, 244, 0.6)");
+      gradientFill.addColorStop(1, "rgba(255, 255, 255, 0.6)");
+
+
+      lineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates, // 날짜 배열
+          datasets: [{
+            label: "",
+            data: counts, // 카운트 배열
+            fill: true,
+            backgroundColor: gradientFill,
+            borderColor: "rgba(78, 115, 223, 1)",
+            pointBorderColor: "rgba(78, 115, 223, 1)",
+            pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+            pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+            tension: 0.5,
+            pointRadius: 3,
+            pointHoverRadius: 3,
+            pointHitRadius: 10,
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          response: false,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              display: true,
+              beginAtZero: true,
+              grid: {
+                drawBorder: false, // Do not draw the border line for y-axis
+                display: false // Do not display grid lines for y-axis
+              },
+              ticks: {
+                display: true // Display ticks on y-axis
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+
+        }
+      });
+    }
+
+    function updateDoughnutChart(data) {
+      console.log(data);
+      // 카테고리별로 데이터를 집계합니다.
+      const categoryData = data.reduce((acc, item) => {
+        const category = item.category;
+        const count = item.count;
+        if (!acc[category]) {
+          acc[category] = 0;
+        }
+        acc[category] += count;
+        return acc;
+      }, {});
+
+      // 차트의 라벨과 데이터를 추출합니다.
+      const chartLabels = Object.keys(categoryData);
+      const chartData = chartLabels.map(label => categoryData[label]);
+
+      const ctx = document.getElementById('doughnutChart').getContext('2d');
+
+      // 기존 차트가 있다면 제거
+      if (doughnutChartInstance) {
+        doughnutChartInstance.destroy();
+      }
+
+      // 도넛 차트 생성
+      doughnutChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            label: 'Category Counts',
+            data: chartData,
+            backgroundColor: [
+              '#0287BE',
+              '#47C6E8',
+              '#F7C74B',
+              '#FDE775',
+              '#F0E6B4'
+            ],
+            borderColor: [
+              '#0287BE',
+              '#47C6E8',
+              '#F7C74B',
+              '#FDE775',
+              '#F0E6B4'
+            ],
+            borderWidth: 1,
+            weight: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          cutoutPercentage: 80,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltips: {
+              backgroundColor: "rgb(255,255,255)",
+              bodyFontColor: "#858796",
+              borderColor: '#dddfeb',
+              borderWidth: 1,
+              xPadding: 15,
+              yPadding: 15,
+              displayColors: false,
+              caretPadding: 10,
+            },
+            legend: {
+              display: true, // 범례 표시 여부
+              position: 'right', // 범례의 위치를 오른쪽으로 변경
+              align: 'center',
+              labels: {
+                boxWidth: 20, // 범례 색상 상자의 너비
+                padding: 20, // 범례 항목 간의 패딩
+                boxWidth: 80, // 범례 색상 상자의 너비
+                // 범례 항목 간의 패딩
+                usePointStyle: true
+                // }
+              },
+              cutoutPercentage: 80
+            }
+          }
+        },
+      });
+    }
+
+
+
+    $(function () {
+      init();
+    })
+
+    function init() {
+      $.ajax({
+        url: "/manager/count",
+        method: "get",
+        success: function (resp) {
+          $("#todayRegisteredProd").html(resp["todayRegisteredProd"]);
+          $("#todayWeirdProd").html(resp["todayWeirdProd"]);
+          $("#todayRegisteredCustomer").html(resp["todayRegisteredCustomer"]);
+          $("#unprocessedReport").html(resp["unprocessedReport"]);
+        }
+      });
+
+      // 일자별 등록한 상품개수 확인 
+      $.ajax({
+        url: "/manager/board/registerProductCount",
+        method: "get",
+        success: function (data) {
+          // data 출력 
+          // console.log("Received data from /manager/board/registerProductCount:", data);
+
+          // createDate만 담은 배열 생성
+          var createDates = data.map(function (item) {
+            return item.createDate;
+          });
+
+          // count만 담은 배열 생성
+          var counts = data.map(function (item) {
+            return item.count;
+          });
+
+
+          new Chart(document.getElementById("registerProduct"), {
+            type: 'line',
+            data: {
+              labels: createDates,
+              datasets: [{
+                label: "전체 상품 등록 수",
+                borderColor: 'rgba(54, 162, 235, 1)', // 파란색 선
+                backgroundColor: 'rgba(54, 162, 235, 0.2)', // 파란색 배경 (선 아래 채우기)
+                pointBorderColor: 'rgba(54, 162, 235, 1)', // 파란색 포인트 테두리
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)', // 파란색 포인트 배경
+                pointHoverBackgroundColor: '#fff', // 포인트 호버 배경
+                pointHoverBorderColor: 'rgba(220,220,220,1)', // 포인트 호버 테두리
+                pointBorderWidth: 1,
+                data: counts,
+                lineTension: 0.4
+              }]
+            }
+          })
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Error fetching data from /manager/board/registerProductCount:", textStatus, errorThrown);
+        }
+      });
+
+      // 카테고리별 정상, 이상 상품 판별 개수
+      $.ajax({
+        url: "/manager/board/categoryProductCount",
+        method: "get",
+        success: function (data) {
+          // console.log("categoryProductCount:", data);
+
+          // 카테고리를 라벨로 변환
+          const labels = Object.keys(data);
+
+          // 이상과 정상 데이터셋 생성
+          const abnormalData = labels.map(label => data[label]['이상']);
+          const normalData = labels.map(label => data[label]['정상']);
+
+          // 출력
+          // console.log("labels", labels);  
+          // console.log("abnormalData", abnormalData);
+          // console.log("normalData", normalData);
+
+          // barchart
+          // 차트 데이터 설정
+          const chartData = {
+            labels: labels,
+            datasets: [
+              {
+                label: '이상',
+                data: abnormalData,
+                backgroundColor: 'rgba(255, 99, 132, 0.5)'
+              },
+              {
+                label: '정상',
+                data: normalData,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)'
+              }
+            ]
+          };
+
+          // 차트 생성
+          const ctx = document.getElementById('categoryProduct');
+          const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+              scales: {
+                x: {
+                  stacked: true,
+                  grid: {
+                    drawBorder: true,
+                    display: true
+                  }
+                },
+                y: {
+                  stacked: true,
+                  grid: {
+                    drawBorder: false,
+                    drawTicks: false,
+                    display: false
+                  },
+                  ticks: {
+                    display: true
+                  }
+                }
+              }
+            }
+          });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Error fetching data: " + textStatus, errorThrown);
+        }
+      });
+
+    }
+
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const btn = document.querySelector("button");
+      var doneTimeout = null,
+        resetTimeout = null;
+
+      if (btn) {
+        btn.addEventListener("click", function () {
+          const runClass = "btn--running";
+          const doneClass = "btn--done";
+          // Set the submit duration to 9 seconds
+          const submitDuration = 14000; // 9 seconds
+          // The total duration the button stays in the "done" state
+          const totalDuration = 14000; // 14 seconds
+          const resetDuration = totalDuration - submitDuration; // This will be the remaining time after the submitDuration
+
+          // fake the submission
+          this.disabled = true;
+          this.classList.add(runClass);
+
+          clearTimeout(doneTimeout);
+          clearTimeout(resetTimeout);
+
+          doneTimeout = setTimeout(() => {
+            this.classList.remove(runClass);
+            this.classList.add(doneClass);
+
+            // reset the button
+            resetTimeout = setTimeout(() => {
+              this.disabled = false;
+              this.classList.remove(doneClass);
+            }, resetDuration);
+
+          }, submitDuration);
+        });
+      }
+    });
+
+
+
+
+
+  </script>
+
+</head>
+
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+          <div class="navbar nav_title">
+            <a th:href="@{/manager/manager_index}" class="site_title">
+              <img th:src="@{/production/images/ec21logo.png}" alt="">
+            </a>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <!-- menu profile quick info -->
+          <div class="profile clearfix">
+            <div class="profile_pic">
+              <img th:src="@{/production/images/user.jpeg}" alt="..." class="img-circle profile_img">
+            </div>
+            <div class="profile_info">
+              <h2>이길아 님</h2>
+            </div>
+          </div>
+          <!-- /menu profile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+              <ul class="nav side-menu">
+                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/manager_index}">Dashboard</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-edit"></i> 상품관리 <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/productList}">전체 상품 조회</a></li>
+                    <li><a th:href="@{/manager/modelPredict}">모델로 이상상품 판별</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-users"></i> 회원관리 <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/customerList}">전체회원</a></li>
+                    <li><a th:href="@{/manager/reportedCustomerList}">신고당한회원</a></li>
+                    <li><a th:href="@{/manager/blackList}">블랙리스트회원</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      <div class="top_nav">
+        <div class="nav_menu">
+          <div class="nav toggle">
+            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+          </div>
+          <nav class="nav navbar-nav">
+            <ul class=" navbar-right">
+              <li class="nav-item dropdown open" style="padding-left: 15px;">
+                <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown"
+                  data-toggle="dropdown" aria-expanded="false">
+                  <img th:src="@{/production/images/user.jpeg}" alt="...">관리자
+                </a>
+                <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" th:href=@{/}><i class="fa fa-home pull-right"></i> Home</a>
+                  <a class="dropdown-item" th:href="@{/main/logout}"><i class="fa fa-sign-out pull-right"></i> Log
+                    Out</a>
+                </div>
+              </li>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col">
+
+        <!-- /top tiles -->
+        <!-- 상품, 회원 count -->
+        <!-- 240413 dy : id값 부여하고 ajax로 값 꽂아 넣기 -->
+        <div class="row">
+
+          <!-- 당일 등록 상품-->
+          <div class="col-xl-3 col-md-6 mb-2">
+            <div class="card border-left-primary shadow radius">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2 main">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1 ">
+                      <i class=" fa fa-edit"></i>
+                      <a th:href="@{/manager/productList}">당일 등록 상품
+                        수
+                      </a>
+
+                    </div>
+                    <div class="count" id="todayRegisteredProd"></div>
+                    <!-- 지난 주 대비 증감률-->
+                    <!-- <span class="count_bottom"><i class="blue"><i class="fa fa-sort-asc"></i>4% </i> From last Week</span> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!--당일 이상상품 등록-->
+          <div class="col-xl-3 col-md-6 mb-2">
+            <div class="card border-left-primary shadow radius">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2 main">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1 ">
+                      <i class=" fa fa-warning"></i>
+                      <a th:href="@{/manager/modelPredict}">당일 이상상품 등록
+                        수</a>
+
+                    </div>
+                    <div class="count" id="todayWeirdProd">
+
+                    </div>
+                    <!-- 지난 주 대비 증감률-->
+                    <!-- <span class="count_bottom"><i class="blue"><i class="fa fa-sort-asc"></i>4% </i> From last Week</span> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!--당일 회원 가입 수-->
+          <div class="col-xl-3 col-md-6 mb-2">
+            <div class="card border-left-primary shadow radius">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2 main">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1 ">
+                      <i class=" fa fa-user"></i>
+                      <a th:href="@{/manager/customerList}">당일 회원 가입 수</a>
+
+                    </div>
+                    <div class="count" id="todayRegisteredCustomer">
+
+                    </div>
+                    <!-- 지난 주 대비 증감률-->
+                    <!-- <span class="count_bottom"><i class="blue"><i class="fa fa-sort-asc"></i>4% </i> From last Week</span> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 미처리된 신고 개수-->
+
+          <div class="col-xl-3 col-md-6 mb-2">
+            <div class="card border-left-primary shadow radius">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2 main">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1 ">
+                      <i class="fa fa-bullhorn"></i>
+                      <a th:href="@{/manager/reportedCustomerList}">미처리된 신고
+                        개수</a>
+                    </div>
+                    <div class="count" id="unprocessedReport">
+
+                    </div>
+                    <!-- 지난 주 대비 증감률-->
+                    <!-- <span class="count_bottom"><i class="blue"><i class="fa fa-sort-asc"></i>4% </i> From last Week</span> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <br />
+
+          <!-- 상품, 회원 count 끝 -->
+
+          <!-- 차트 시작 -->
+          <div class="row">
+            <div class="col-md-12 mb-2">
+              <div class="form-inline">
+                <div class="form-group">
+                  <label for="startDate">Start Date:</label>
+                  <input type="date" id="startDate" class="form-control mx-sm-3">
+                </div>
+                <div class="form-group">
+                  <label for="endDate">End Date:</label>
+                  <input type="date" id="endDate" class="form-control mx-sm-3">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 상품 등록시 추가할 버튼 -->
+          <!-- <div class="submitfirst">
+            <div class="submitdiv">
+              <button class="submitBtn" type="button">
+                <span class="submitBtn__text">Submit</span>
+                <svg class="btn__progress" viewBox="0 0 48 48" width="48px" height="48px">
+                  <circle class="btn__progress-track" r="20" cx="24" cy="24" fill="none" stroke="#c7cad1"
+                    stroke-width="8">
+                  </circle>
+                  <circle class="btn__progress-fill" r="20" cx="24" cy="24" fill="none" stroke="#000000"
+                    stroke-width="8" transform="rotate(-90,24,24)" stroke-dasharray="125.66 125.66"
+                    stroke-dashoffset="125.66"></circle>
+                  <polyline class="btn__progress-check" points="12,24 20,32 36,16" fill="none" stroke="#fff"
+                    stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="34 34"
+                    stroke-dashoffset="34"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div> -->
+          <!-- 상품 등록시 추가할 버튼끝 -->
+
+          <div class="row">
+            <!-- 일자별 상품등록 개수 라인, 도넛 그래프-->
+            <div class="col-md-6 mb-2">
+              <div class=" x_panel shadow">
+                <div class="x_title">
+                  <h2>일자별 상품등록 개수</h2>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content ">
+                  <!-- <button onclick="updateCharts()">Update Charts</button> -->
+                  <div class="mid">
+                    <canvas id="lineChart" width="800" height="400"></canvas>
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+            <!-- 일자별 상품등록 개수 라인, 도넛 그래프 끝 -->
+            <!-- 카테고리별 이상/정상상품 판별개수 그래프 -->
+            <div class="col-md-6 mb-2 ">
+              <div class=" x_panel shadow">
+                <div class="x_title">
+                  <h2>일자별 상품등록 개수</h2>
+                  <div class="clearfix"></div>
+                </div>
+
+                <div class="x_content ">
+                  <div class="mid">
+                    <canvas id="doughnutChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- /카테고리별 이상/정상상품 판별개수 그래프 끝-->
+            <!-- 카테고리별 이상/정상상품 판별개수 그래프 -->
+            <div class="col-md-6 mb-2">
+              <div class=" x_panel shadow">
+                <div class="x_title">
+                  <h2>카테고리별 이상/ 정상상품 판별 개수</h2>
+                  <div class="clearfix"></div>
+                </div>
+
+
+                <div class="x_content">
+                  <div class="Cchart">
+                    <!-- bar chart -->
+                    <canvas id="categoryProduct"></canvas>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <!-- /카테고리별 이상/정상상품 판별개수 그래프 끝-->
+
+            <div class="col-md-3 mb-2">
+              <div class="x_panel shadow">
+
+                <div>
+                  <div class="x_title">
+                    <h2>금지어 top5</h2>
+                    <div class="clearfix"></div>
+                  </div>
+
+                  <div class="x_content">
+                    <table id="prohibitedWordsTable" class="table table-striped jambo_table table-bordered ">
+                      <thead>
+                        <tr>
+                          <th class="column-title">금지어</th>
+                          <th class="column-title">횟수</th>
+                        </tr>
+                      </thead>
+                      <tbody id="similarWordsTable">
+                        <tr>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 mb-2">
+              <div class="x_panel shadow flex">
+
+                <div>
+                  <div class="x_title">
+                    <h2>주간 요약</h2>
+                    <div class="clearfix"></div>
+                  </div>
+
+                  <div class="x_content">
+                    <table class="table table-striped jambo_table table-bordered ">
+                      <thead>
+                        <tr>
+                          <th class="column-title">일자</th>
+                          <th class="column-title">상품</th>
+                          <th class="column-title">회원</th>
+                        </tr>
+                      </thead>
+                      <tbody id="weeklyRegSummaryTable">
+                        <tr>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- jQuery -->
+
+    <!-- Bootstrap -->
+    <script th:src="@{/vendors/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+    <!-- FastClick -->
+    <script th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+
+    <!-- Chart.js -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- bootstrap-progressbar -->
+    <script th:src="@{/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
+    <!-- iCheck -->
+    <script th:src="@{/vendors/iCheck/icheck.min.js}"></script>
+
+    <!-- bootstrap-daterangepicker -->
+    <script th:src="@{/vendors/moment/min/moment.min.js}"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script th:src="@{/build/js/custom.js}"></script>
+
+</body>
+
+</html>

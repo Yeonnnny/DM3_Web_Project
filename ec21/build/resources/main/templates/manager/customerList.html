@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" th:href="@{/production/images/ec21logo.png}">
+
+  <title>ec21 관리자 페이지</title>
+
+  <!-- Web Font -->
+  <!-- Web Font -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link th:href="@{/vendors/bootstrap/dist/css/bootstrap.min.css}" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link th:href="@{/vendors/font-awesome/css/font-awesome.min.css}" rel="stylesheet">
+  <!-- NProgress -->
+  <link th:href="@{/vendors/nprogress/nprogress.css}" rel="stylesheet">
+  <!-- iCheck -->
+  <link th:href="@{/vendors/iCheck/skins/flat/green.css}" rel="stylesheet">
+
+  <!-- bootstrap-progressbar -->
+  <link th:href="@{/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css}" rel="stylesheet">
+  <!-- JQVMap -->
+  <link th:href="@{/vendors/jqvmap/dist/jqvmap.min.css}" rel="stylesheet" />
+  <!-- bootstrap-daterangepicker -->
+  <link th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}" rel="stylesheet">
+
+  <!-- Custom Theme Style -->
+  <link th:href="@{/build/css/custom.css}" rel="stylesheet">
+
+  <!-- 240414 dy : JQuery 파일 추가 및 ajax 추가 // 삭제-->
+  <!-- 240415 dy : 카테고리와 검색어 기능 구현 // 삭제-->
+  <!-- 240418 iy : 모달기능 구현 -->
+  <!-- 240419 dy : 모달에 리스트 꽂아넣기 -->
+  <script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+
+  <script>
+    $(function () {
+
+      // 모달 변수 초기화
+      var modal1 = $("#myModal1");
+      var modal2 = $("#myModal2");
+
+
+      // 첫번째 모달 닫기
+      // 닫기 버튼 이벤트
+      $("#closeBtn1").on("click", function (event) {
+        modal1.hide();
+      });
+
+      // 모달 백그라운드 클릭 이벤트
+      $(window).on("click", function (event) {
+        if ($(event.target).is(modal1)) {
+          modal1.hide();
+        }
+
+      });
+
+      // 두번째 모달 닫기
+      // 닫기 버튼 이벤트
+      $("#closeBtn2").on("click", function (event) {
+        modal2.hide();
+      });
+
+      // 모달 백그라운드 클릭 이벤트
+      $(window).on("click", function (event) {
+        if ($(event.target).is(modal2)) {
+          modal2.hide();
+        }
+
+      });
+
+      // 첫번째 모달 버튼 클릭 시 작동
+      // 이벤트 위임을 사용하여 동적 요소에 이벤트 연결
+      $(document).on("click", "button[id^='modalBtn']", function () {
+        let modalCompName = $(this).data("compname");
+        let modalCompUrl = $(this).data("compurl");
+        let modalEmail = $(this).data("email");
+        let modalCustomerName = $(this).data("customername");
+        let modalbusiNo = $(this).data("busino");
+        let modalAddress = $(this).data("address");
+        let modalCustomerId = $(this).data("id");
+        console.log(modalCustomerId);
+
+        let tableContent = `<thead>
+                              <tr>
+                                <th style="width: 25%;">상품ID</th>
+                                <th style="width: 20%;">상품카테고리</th>
+                                <th class="project_progress">상품명</th>
+                                <th style="width: 10%;">현상태</th>
+                              </tr>
+                            </thead> 
+                            <tbody>`;
+
+        // 판매 상품 리스트 가져오기
+        $.ajax({
+          url: "/manager/customerList/getCustomerProductDTOs",
+          data: { "customerId": modalCustomerId },
+          method: "GET",
+          success: function (resp) {
+            if (!resp || resp.length === 0) { // 판매 상품이 없는 경우
+              tableContent += `<tr><td colspan="4"><span>결과가 존재하지 않습니다.</span></td></tr></tbody>`;
+            } else {
+              let list = JSON.parse(resp);
+              if (list.length === 0) { // 파싱된 리스트가 비어 있는 경우
+                tableContent += `<tr><td colspan="4"><span>결과가 존재하지 않습니다.</span></td></tr></tbody>`;
+              } else {
+                list.forEach(function (item) {
+                  // judge 값 라벨링
+                  let label = '';
+                  if (item.judge === 'Y') {
+                    label = '정상';
+                  } else if (item.judge === 'N') {
+                    label = '이상';
+                  } else {
+                    label = '미처리'; // item.judge가 null이거나 다른 값인 경우
+                  }
+                  tableContent += `<tr>
+                                      <td >${item.productId}</td>
+                                      <td>${item.category}</td>
+                                      <td>
+                                        <a href="#" id ="productList" class="productLink"
+                                        data-product-id="${item.productId}"> 
+                                        ${item.productName}
+                                        </a>
+                                      </td>
+                                      <td >${label}</td>
+                                    </tr>`;
+                                    // data-product-name="${item.productName}"  
+                                    // data-product-category="${item.category}" 
+                                    // data-product-desc="${item.escapedProductDesc}"
+                                    // data-price="${item.price}"
+                                    // data-moq="${item.moq}"
+                                    // data-unit="${item.unit}"
+                                    // data-origin="${item.origin}">
+                    });
+                    }
+              tableContent += '</tbody>';
+            }
+            // 모달 컨텐츠 업데이트
+            $("#modalCustomerId").html(modalCustomerId);
+            $("#modalCompName").html(modalCompName);
+            $("#modalCompUrl").html(modalCompUrl);
+            $("#modalEmail").html(modalEmail);
+            $("#modalCustomerName").html(modalCustomerName);
+            $("#modalbusiNo").html(modalbusiNo);
+            $("#modalAddress").html(modalAddress);
+            $("#modalTable").html(tableContent);
+            $('#blackButton').attr('data-id', modalCustomerId); // 블랙 버튼에 회원ID 넣기
+            // 모달 열기
+            $("#myModal1").modal('show');
+          }
+        });
+
+        // 두 번째 모달 열기 버튼 클릭 이벤트
+        $(document).on("click", "a[id^='productList']", function () {
+          let modalProductId = $(this).data("product-id");  // 데이터 속성에서 상품ID 읽기
+          // let modalProductDesc = $(this).data("product-desc");  // 데이터 속성에서 설명 읽기
+
+          // let modalProductName = $(this).data("product-name");
+          // let modalProductCategory = $(this).data("product-category");
+          // let modalPrice = $(this).data("price");
+          // let modalOrigin = $(this).data("origin");
+          // let modalUnit = $(this).data("unit");
+          // let modalMoq = $(this).data("moq");
+          $.ajax({
+            url : "/manager/customerList/forSecondModal",
+            data:{"productId":modalProductId},
+            success: function (resp) {
+              $("#modalProductName").html(resp.productName);
+              $("#modalProductCategory").html(resp.category);
+              $("#modalProductDesc").html(resp.productDesc);
+              $("#modalPrice").html(resp.price);
+              $("#modalOrigin").html(resp.origin);
+              $("#modalMoq").html(resp.moq);
+              $("#modalUnit").html(resp.unit);
+              $("#displayMoqUnit").html(`${resp.moq} ${resp.unit}`);
+  
+              $.ajax({
+                url: `https://restcountries.com/v3.1/name/${resp.origin}`,
+                method: 'GET',
+                success: function (data) {
+                  let countryCode = data[0].cca2; // 국가 코드
+                  let flagImageUrl = `https://flagsapi.com/${countryCode}/shiny/64.png`;
+                  $("#countryFlag").attr("src", flagImageUrl);
+                  $("#countryFlag").attr("alt", `${modalOrigin} Flag`);
+                  console.log(countryCode);
+                },
+                error: function () {
+                  console.log("Error retrieving country data");
+                }
+              });
+
+              $("#myModal2").modal('show'); // 두 번째 모달을 엽니다.
+            }
+          });
+          
+        });
+
+      });
+
+
+      var etcRadio = $("#etcRadio");
+      var etcReasonInput = $("#etcReasonInput");
+      var etcReasonError = $("#etcReasonError");
+
+      // Radio 변경 감지
+      $('input[type="radio"][name="reason"]').change(function () {
+        if (etcRadio.is(':checked')) {
+          etcReasonInput.show();
+          etcReasonInput.attr("required", true);
+          etcReasonError.hide();
+        } else {
+          etcReasonInput.hide();
+          etcReasonInput.attr("required", false);
+        }
+      });
+
+      // 블랙 버튼 클릭 이벤트
+      $('#blackButton').click(function () {
+        if (etcRadio.is(':checked') && etcReasonInput.val().trim() === "") {
+          etcReasonError.show();
+          alert("기타 사유를 입력해주세요.");
+        } else {
+          etcReasonError.hide();
+          // 블랙 사유 가져오기
+          let customerId = $(this).data("id");
+          console.log(customerId);
+          let blackReason = $('input[name="reason"]:checked').val();
+          let etcReason = $("#etcReasonInput").val();
+
+          if (confirm(customerId + "를 블랙회원으로 처리하시겠습니까? ")) {
+            // customerId를 블랙리스트 DB에 등록하는 요청
+            $.ajax({
+              url: "/manager/customerList/toBlack",
+              data: { "customerId": customerId, "blackReason": blackReason, "etcReason": etcReason },
+              method: "GET",
+              success: function (resp) {
+                if (resp) {
+                  alert("블랙회원으로 처리되었습니다.");
+                  // 모달창 닫기
+                  $('#myModal1').modal('hide');
+                  // 페이지 새로고침
+                  window.location.reload();
+                }
+              }
+            });
+          }
+        }
+      }); // -- End (블랙 클릭 이벤트) --
+
+      // 모달창 나가면 초기화
+      $('#myModal1').on('hidden.bs.modal', function (e) {
+        // 입력 필드 초기화
+        $("#etcReasonInput").val('');
+
+        // 라디오 버튼 초기화 (기본값으로 설정하고 싶은 버튼의 id를 'defaultRadio'로 가정)
+        // $("#defaultRadio").prop("checked", true);
+
+        // 라디오 버튼 선택 해제
+        $('input[type="radio"][name="reason"]').prop("checked", false);
+
+        // 기타 사유 입력 상자를 숨기고 값 초기화
+        $('#etcReasonInput').hide().val('');
+
+        // 에러 메시지 숨기기
+        $("#etcReasonError").hide();
+      });
+
+    });
+
+
+  </script>
+</head>
+
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+          <div class="navbar nav_title">
+            <a th:href="@{/manager/manager_index}" class="site_title">
+              <img th:src="@{/production/images/ec21logo.png}" alt="">
+            </a>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <!-- menu profile quick info -->
+          <div class="profile clearfix">
+            <div class="profile_pic">
+              <img th:src="@{/production/images/user.jpeg}" alt="..." class="img-circle profile_img">
+            </div>
+            <div class="profile_info">
+              <h2>이길아 님</h2>
+            </div>
+          </div>
+          <!-- /menu profile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+              <ul class="nav side-menu">
+                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/manager_index}">Dashboard</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-edit"></i> 상품관리 <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/productList}">전체 상품 조회</a></li>
+                    <li><a th:href="@{/manager/modelPredict}">모델 결과 조회</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-users"></i> 회원관리 <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/customerList}">전체 회원 조회</a></li>
+                    <li><a th:href="@{/manager/reportedCustomerList}">신고 회원 조회</a></li>
+                    <li><a th:href="@{/manager/blackList}">블랙 회원 조회</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      <div class="top_nav">
+        <div class="nav_menu">
+          <div class="nav toggle">
+            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+          </div>
+          <nav class="nav navbar-nav">
+            <ul class=" navbar-right">
+              <li class="nav-item dropdown open" style="padding-left: 15px;">
+                <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown"
+                  data-toggle="dropdown" aria-expanded="false">
+                  <img th:src="@{/production/images/user.jpeg}" alt="...">관리자
+                </a>
+                <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" th:href=@{/}><i class="fa fa-home pull-right"></i> Home</a>
+                  <a class="dropdown-item" th:href="@{/main/logout}"><i class="fa fa-sign-out pull-right"></i> Log
+                    Out</a>
+                </div>
+              </li>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <div class="">
+          <!-- <div class="page-title">
+            <div class="title_left">
+              <h3>Member <small>회원관리</small></h3>
+            </div>
+          </div> -->
+
+          <div class="clearfix"></div>
+
+          <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h3>전체 회원 관리</h3>
+                  <div class="clearfix"></div>
+                </div>
+
+                <div class="title_right">
+                  <div class="col-md-5 col-sm-5   form-group pull-right top_search">
+                    <form th:action="@{/manager/customerList}" method="get">
+                      <div class="input-group">
+                        <select name="searchCategory" id="searchCategory">
+                          <option value="total" th:selected="${searchCategory eq 'total'}">전체</option>
+                          <option value="customerId" th:selected="${searchCategory eq 'customerId'}">회원ID</option>
+                          <option value="compName" th:selected="${searchCategory eq 'compName'}">회사명</option>
+                        </select>
+                        <input type="text" class="form-control" id="searchWord" name="searchWord"
+                          placeholder="Search for..." th:value="${searchWord}">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="submit">찾기</button>
+                        </span>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+
+                <div class="x_content">
+                  <div>
+                    <h3>총 개수: <span th:text="${#lists.size(list)}"></span></h3>
+                  </div>
+                  <table id="" class="table table-striped jambo_table table-bordered " cellspacing="0" width="100%">
+
+                    <thead>
+                      <tr class="headings">
+                        <th class="column-title"></th>
+                        <th class="column-title" style="width: 6%;">구분</th>
+                        <th class="column-title">회원ID</th>
+                        <th class="column-title">담당자명</th>
+                        <th class="column-title">회사명</th>
+                        <th class="column-title">부서명</th>
+                        <th class="column-title">국가IP</th>
+                      </tr>
+                    </thead>
+                    <tbody id="result">
+                      <tr class="even pointer" th:each="customer: ${list}">
+                        <input type="hidden" name="" id="customerId" th:value="${customer.customerId}">
+                        <td>
+                          <button th:id="'modalBtn' + ${customer.customerId}" class="modalBtn"
+                            th:data-compName="${customer.compName}" th:data-compUrl="${customer.compUrl}"
+                            th:data-email="${customer.email}" th:data-customerName="${customer.customerName}"
+                            th:data-busiNo="${customer.busiNo}" th:data-address="${customer.address}"
+                            th:data-id="${customer.customerId}"><i class="fa fa-plus-square-o"></i></button>
+                        </td>
+                        <td th:text="${customer.customerGubun}">셀러</td>
+                        <td th:text="${customer.customerId}">System Architect</td>
+                        <td th:text="${customer.customerName}">sales Assistant</td>
+                        <td th:text="${customer.compName}">Edinburghasdfsadfsf</td>
+                        <td th:text="${customer.customerDepartment}">abcdefghtmldkasjf</td>
+                        <td th:text="${customer.remoteIp}">121.172.252.00</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /page content -->
+
+
+  <!-- 첫번째 모달창 -->
+  <!-- 모달 컨테이너 -->
+  <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <!-- 모달창의 헤더부분의 시작 -->
+        <div class="modal-header">
+          <h4 class="modal-title">상세 페이지</h4>
+        </div>
+
+        <!-- 모달창의 헤더부분의 끝 -->
+        <!-- 모달창의 바디부분의 시작 바디부분이 모달창에서 표시하고자하는 컨텐츠를 입력한다.-->
+        <div class="modal-body">
+          <div class="info">
+            <ol>
+              <li>
+                <span class="dtr-title">회사명</span>
+                <span id="modalCompName">-</span>
+              </li>
+              <li>
+                <span class="dtr-title">URL</span>
+                <span id="modalCompUrl">-</span>
+              </li>
+              <li>
+                <span class="dtr-title">회사이메일</span>
+                <span id="modalEmail">-</span>
+              </li>
+              <li>
+                <span class="dtr-title">담당자</span>
+                <span id="modalCustomerName">-</span>
+              </li>
+              <li>
+                <span class="dtr-title">회사 전화번호</span>
+                <span id="modalbusiNo">-</span>
+              </li>
+              <li>
+                <span class="dtr-title">회사주소</span>
+                <span id="modalAddress">-</span>
+              </li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+
+              <table class="table table-striped jambo_table bulk_action" id="modalTable">
+                <thead>
+                  <tr>
+                    <th>상품ID</th>
+                    <th>상품카테고리</th>
+                    <th>상품명</th>
+                    <th>현상태</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>293814</td>
+                    <td>food</td>
+                    <td>당근</td>
+                    <td>정상</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 모달 바디 -->
+        <div class="modal-body">
+          <!-- 기타 사유 입력 폼 -->
+          <div class="modalForm">
+            <input type="radio" name="reason" value="DRUG">마약
+            <input type="radio" name="reason" value="IPR">지적재산권 침해
+            <input type="radio" name="reason" value="SPAM">다발성 이메일
+            <input type="radio" name="reason" value="ETC" id="etcRadio">기타
+            <input type="text" name="etcReason" id="etcReasonInput" placeholder="기타 사유 입력" style="display: none;">
+            <!-- 기타 사유 입력 에러 메시지 -->
+            <div id="etcReasonError" style="color: red; display: none;">기타 사유를 입력해주세요.</div>
+            <input type="button" class="btn btn-black btn-xs toWeird" value="블랙" id="blackButton">
+          </div>
+        </div>
+
+        <!-- 모달 푸터 -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-xs" id="closeBtn1" data-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 첫번째 모달 끝 -->
+
+  <!-- 두번째 모달창-->
+  <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+
+        <h2 id="modalProductCategory"></h2>
+        <h4 class="modalProductName" id="modalProductName"></h4>
+
+        <div class="modal-body">
+          <div class="info">
+            <ol>
+              <!-- <li>
+                <span class="dtr-title">Category:</span>
+                <span id="modalProductCategory">-</span>
+              </li> -->
+              <li>
+                <span class="dtr-title">Price:</span>
+                $ <span id="modalPrice">-</span> 
+              </li>
+              <!-- <li>
+                <span class="dtr-title">Origin:</span>
+                <span id="modalOrigin">-</span>
+              </li> -->
+              <li>
+                <span class="dtr-title">Origin:</span>
+                <span id="modalOrigin">-</span>
+                <img id="countryFlag" src="" alt="Country Flag" style="width:20px; height:20px;">
+              </li>
+
+              <li>
+                <span class="dtr-title">Minimum Order Quantity:</span>
+                <span id="displayMoqUnit">-</span>
+              </li>
+              <li>
+                <span class="dtr-title">Product Details:</span>
+                <span id="modalProductDesc">-</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- 모달 푸터 -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-xs" id="closeBtn2" data-dismiss="modal">닫기</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- 두번째 모달창 끝-->
+
+
+  <!-- jQuery -->
+  <!-- <script th:src="@{/vendors/jquery/dist/jquery.js}"></script> -->
+  <!-- Bootstrap -->
+  <script th:src="@{/vendors/bootstrap/dist/js/bootstrap.bundle.js}"></script>
+  <!-- FastClick -->
+  <script th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+  <!-- NProgress -->
+  <!-- <script th:src="@{/vendors/nprogress/nprogress.js}"></script> -->
+  <!-- iCheck -->
+  <script th:src="@{/vendors/iCheck/icheck.min.js}"></script>
+
+  <!-- Custom Theme Scripts -->
+  <script th:src="@{/build/js/custom.js}"></script>
+
+  <!-- 모달-->
+  <!-- JQUERY -->
+  <!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> -->
+
+  <!-- JQUERY-UI -->
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <!-- bootstrap-theme.min.css -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+  <script src="/vendors/datatables.net/js/jquery.dataTables.js"></script>
+  <script src="/vendors/datatables.net-bs/js/dataTables.bootstrap.js"></script>
+  <script src="/vendors/datatables.net-buttons/js/dataTables.buttons.js"></script>
+  <script src="/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.js"></script>
+  <script src="/vendors/datatables.net-buttons/js/buttons.flash.js"></script>
+  <script src="/vendors/datatables.net-buttons/js/buttons.html5.js"></script>
+  <script src="/vendors/datatables.net-buttons/js/buttons.print.js"></script>
+  <script src="/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.js"></script>
+  <script src="/vendors/datatables.net-keytable/js/dataTables.keyTable.js"></script>
+  <script src="/vendors/datatables.net-responsive/js/dataTables.responsive.js"></script>
+  <script src="/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  <script src="/vendors/datatables.net-scroller/js/dataTables.scroller.js"></script>
+  <script src="/vendors/jszip/dist/jszip.js"></script>
+  <script src="/vendors/pdfmake/build/pdfmake.js"></script>
+  <script src="/vendors/pdfmake/build/vfs_fonts.js"></script>
+
+</body>
+
+</html>

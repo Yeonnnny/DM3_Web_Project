@@ -1,0 +1,252 @@
+/*======================================
+	start Inquiry CSS
+========================================*/
+.row {
+    margin-left: -85px;
+}
+
+.topbar .top-left a.logo {
+    display: flex;
+    align-items: center;
+}
+
+.topbar .top-left .logo img {
+    width: 100px;
+    height: 30px;
+    margin-top: -2px;
+    /* transform: translate(50%, 0); */
+    position: relative;
+    left: 105%;
+}
+
+.topbar .top-left .logo span {
+    font-size: 24px;
+    text-transform: uppercase;
+    position: relative;
+    left: 53%;
+    font-family: sans-serif;
+    font-weight: bolder;
+}
+
+.main-container {
+    display: flex;
+}
+
+.shop-sidebar {
+    flex: 0;
+    color: #fff;
+}
+
+.shop-sidebar .single-widget.inquiry-category {
+    background-color: #333;
+    height: 100vh;
+    padding: 10px;
+    color: #fff;
+    width: 200px;
+}
+
+
+.shop-sidebar .single-widget.inquiry-category h3 {
+    font-size: 30px;
+    margin: 10px;
+    text-align: justify;
+    /* border-bottom: 1px solid; */
+    padding-bottom: 15px;
+}
+
+.shop-sidebar .single-widget.inquiry-category .categor-list li {
+    display: flex;
+    text-align: justify;
+    align-items: center;
+    font-size: 17px;
+}
+
+.shop-sidebar .single-widget.inquiry-category .categor-list li a {
+    display: block;
+    color: #fff;
+    font-weight: 400;
+    font-size: 16px;
+    text-transform: uppercase;
+    margin: 10px 10px;
+}
+
+.shop-sidebar .single-widget.inquiry-category .categor-list li:hover {
+    background-color: rgba(0, 114, 171, 0.63);
+}
+
+
+.shopping-cart .container {
+    flex: 3;
+    /* 메인 콘텐츠가 차지할 공간 비율 설정 */
+}
+
+
+.inquiry-area .shopping-cart {
+    background: #f5f5f5;
+    padding: 0px;
+    width: 100%;
+}
+
+
+.table.shopping-summery.inquiry {
+    width: 100%;
+    table-layout: fixed;
+    text-align: center;
+    position: relative;
+    left: 0%;
+}
+
+.shopping-summery.inquiry th {
+    font-family: poppins;
+    text-transform: uppercase;
+}
+
+.shopping-summery th.inquiryTitle {
+    width: 38%;
+}
+
+.table.shopping-summery td {
+    background-color: #fff;
+    border-bottom: 1px solid #444;
+    font-size: 16px;
+}
+
+.table.shopping-summery a.inquiryTitle {
+    width: 600px;
+    max-width: 70%;
+    display: -webkit-inline-box;
+    text-align: -webkit-left;
+    cursor: pointer;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+}
+
+
+.table.shopping-summery a.inquiryTitle:hover {
+    font-weight: bolder;
+    color: #999;
+    text-decoration: underline;
+}
+
+.table.shopping-summery td.saved-icon {
+    color: #F7941D;
+}
+
+.table.shopping-summery .saved-icon,
+.delete,
+.spam,
+.no {
+    width: 90px;
+}
+
+.shop-sidebar .single-widget .title {
+    color: #fff;
+    position: relative;
+    font-size: 18px;
+    font-weight: 500;
+    text-transform: capitalize;
+    margin-bottom: 25px;
+    display: block;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+}
+
+.shopping-cart.section .paging {
+    display: flex;
+    justify-content: center;
+}
+
+#inquiryDetail .modal-dialog .modal-content .modal-body {
+    overflow-y: auto;
+    max-height: 510px;
+    height: 350px;
+    margin: 0 15px;
+}
+
+@media (min-width: 700px) {
+    .modal-dialog {
+        margin-top: 30px;
+        /* 태블릿 이상의 화면 크기에 적용될 값 */
+    }
+}
+
+#reportModal th,
+#inquiryDetail th {
+    text-align: justify;
+    line-height: 0px;
+    width: 13%;
+    font-family: 'Poppins' !important;
+    font-size: 17px;
+    padding: 16px;
+}
+
+#reportModal td,
+#inquiryDetail td {
+    text-align: start;
+    padding: 10px 10px;
+    width: 320px;
+    font-size: 18px;
+}
+
+#reportModal .modal-title {
+    font-family: Poppins;
+}
+
+#reportModal .modal-body td {
+    padding-top: 30px;
+}
+
+#modalBlockedId {
+    font-size: 20px;
+    font-weight: 800;
+    margin-left: 11px;
+}
+
+#inquiryDetail .modal-header {
+    color: black;
+    margin-bottom: 20px;
+    font-family: Poppins;
+}
+
+#inquiryDetail .modal-body tr {
+    margin: 15px;
+    text-align: start;
+}
+
+#inquiryDetail .modal-body th.text-center>span {
+    color: #222;
+    display: inline-block;
+    position: sticky;
+    right: -12px;
+    top: 4px;
+    font-size: 16px;
+}
+
+#reportModal .modal-content {
+    width: 95%;
+}
+
+#reportModal .modal-body span {
+    padding-right: 20px;
+    font-size: 18px;
+}
+
+#reportModal .modal-body {
+    <<<<<<< HEAD max-height: 411px;
+    =======max-height: 460px;
+    ;
+    >>>>>>>643e32bfad3171b4f27215b61519d4eb0a3aef8d margin: 0px;
+}
+
+#inquiryDetail .modal-body textarea {
+    resize: none;
+    width: 80%;
+    height: 120px;
+}
+
+/*======================================
+	End Inquiry CSS
+========================================*/

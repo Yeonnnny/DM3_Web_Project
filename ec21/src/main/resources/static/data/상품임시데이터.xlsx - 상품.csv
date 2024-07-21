@@ -1,0 +1,433 @@
+<<<<<<< HEAD
+,PK,Not Null,Not Null,Not Null,Not Null,Not Null,Not Null,Not Null,Not Null,,,Not Null,,,Not Null,Not Null,,Not Null,
+,product_id,product_name,product_desc,product_img,price,origin,moq,unit,category,create_date,update_date,remote_ip,country,hit_count,lstm_predict_proba,lstm_predict,judge,customer_id,product_delete
+1,FO00001-20240409,Fresh Carrots,"Product Name: Fresh Carrots Size: 20cm Material: Carrot Color: Red, orange Is product customizable? Yes Price: Curency: USD Price Range: 170-500 Unit: Per metric ton Production time: Quantity: 24001kg Estimated lead time (days): 10days Supply capability: quantity: 2000Metric Ton time: 30days Product classification: Carrot",,160,Philippines,2000,Ton,FOOD_BEVERAGE,,,103.100.136.0,,,0.5,1,,juujee07,
+2,FO00002-20240409,Wholesale White / Pure Garlic / New Crop Fresh Garlic / Normal White Garlic /Premium Fresh Garlic,"To get the best and sweetest roasted garlic possible, start with a porcelain type that has a strong, robust flavour like German White. This midsummer-cropping garlic is perfect for using fresh in recipes, but it is also outstanding when roasted and spread on warm bread or tossed into gravies and sauces. Storable until the next spring. Yield: 5-7 medium cloves per bulb.",,800,Canada,100,Ton,FOOD_BEVERAGE,,,157.185.144.90,,,0.5,1,,edward9011,
+3,FO00003-20240409,Starbucks-K-Cup-Coffee-PodsMedium Roast Coffee-Pike Place Roast for-Keurig-Brewers,"All our products brand new, factory sealed in box, original, 100% unbox, it comes with full accessories with 1 year international warranty.",,10,United States,50,Unit,FOOD_BEVERAGE,,,170.171.1.255,,,0.5,1,,specialtycare,
+4,FO00004-20240409,Quest-Nutrition-Chocolate Chip Protein Cookie; Keto Friendly; High Protein; Low Carb; 12 Count,"All our products brand new, factory sealed in box, original, 100% unbox, it comes with full accessories with 1 year international warranty.",,5,United States,50,Unit,FOOD_BEVERAGE,,,170.171.1.255,,,0.5,1,,doyeonkim,
+5,FO00005-20240409,Korean Ginseng Candy (Packing Unit :100g),Sweet and refreshing Red Ginseng candy is an absolutely ideal sweet for family members or whilst driving. Red ginseng candy will provide the most refreshing moment in your day.,,13.68,Korea,150,carton,FOOD_BEVERAGE,,,218.239.246.20,,,0.5,1,,heejinkim,
+6,FO00006-20240409,Samyang-Buldak-Carbo Korean Spicy Hot Chicken Stir-Fried Noodles 4.58oz (Pack of 5),"All our products brand new, factory sealed in box, original, 100% unbox, it comes with full accessories with 1 year international warranty.",,2,United States,100,Unit,FOOD_BEVERAGE,,,170.171.1.255,,,0.5,1,,doyeonkim,
+=======
+,PK,Not Null,Not Null,Not Null,Not Null,Not Null,Not Null,Not Null,Not Null,,,Not Null,,,Not Null,Not Null,,Not Null,
+,product_id,product_name,product_desc,product_img,price,origin,moq,unit,category,create_date,update_date,remote_ip,country,hit_count,lstm_predict_proba,lstm_predict,judge,customer_id,product_delete
+1,FO00001-20240409,Fresh Carrots,"Product Name: Fresh Carrots Size: 20cm Material: Carrot Color: Red, orange Is product customizable? Yes Price: Curency: USD Price Range: 170-500 Unit: Per metric ton Production time: Quantity: 24001kg Estimated lead time (days): 10days Supply capability: quantity: 2000Metric Ton time: 30days Product classification: Carrot",,160,Philippines,2000,Ton,FOOD_BEVERAGE,,,103.100.136.0,,,0.5,1,,juujee07,
+2,FO00002-20240409,Wholesale White / Pure Garlic / New Crop Fresh Garlic / Normal White Garlic /Premium Fresh Garlic,"To get the best and sweetest roasted garlic possible, start with a porcelain type that has a strong, robust flavour like German White. This midsummer-cropping garlic is perfect for using fresh in recipes, but it is also outstanding when roasted and spread on warm bread or tossed into gravies and sauces. Storable until the next spring. Yield: 5-7 medium cloves per bulb.",,800,Canada,100,Ton,FOOD_BEVERAGE,,,157.185.144.90,,,0.5,1,,edward9011,
+3,FO00003-20240409,Starbucks-K-Cup-Coffee-PodsMedium Roast Coffee-Pike Place Roast for-Keurig-Brewers,"All our products brand new, factory sealed in box, original, 100% unbox, it comes with full accessories with 1 year international warranty.",,10,United States,50,Unit,FOOD_BEVERAGE,,,170.171.1.255,,,0.5,1,,specialtycare,
+4,FO00004-20240409,Quest-Nutrition-Chocolate Chip Protein Cookie; Keto Friendly; High Protein; Low Carb; 12 Count,"All our products brand new, factory sealed in box, original, 100% unbox, it comes with full accessories with 1 year international warranty.",,5,United States,50,Unit,FOOD_BEVERAGE,,,170.171.1.255,,,0.5,1,,doyeonkim,
+5,FO00005-20240409,Korean Ginseng Candy (Packing Unit :100g),Sweet and refreshing Red Ginseng candy is an absolutely ideal sweet for family members or whilst driving. Red ginseng candy will provide the most refreshing moment in your day.,,13.68,Korea,150,carton,FOOD_BEVERAGE,,,218.239.246.20,,,0.5,1,,heejinkim,
+6,FO00006-20240409,Samyang-Buldak-Carbo Korean Spicy Hot Chicken Stir-Fried Noodles 4.58oz (Pack of 5),"All our products brand new, factory sealed in box, original, 100% unbox, it comes with full accessories with 1 year international warranty.",,2,United States,100,Unit,FOOD_BEVERAGE,,,170.171.1.255,,,0.5,1,,doyeonkim,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+7,FO00007-20240409,"Fresh Apple Supplier,Royal Gala Apple, Green, Fuji, Golden","Best Fresh Apples
+
+A great eating apple, not suitable for baking.
+Skin: yellow with bright red streaks
+Flesh: pale cream Texture: crisp
+Taste: sweet and juicy
+
+Great for eating and baking.
+Skin: golden yellow
+Flesh: green-white
+Texture: juicy
+Taste: sweet, flavoursome, juicy
+
+Delicious, but takes longer than average to cook.
+Skin: dark red with scarlet streaks
+Flesh: yellowish
+Texture: firm, crisp, juicy
+Taste: very sweet
+
+Excellent as a snack and in salads. Keeps shape when cooked.
+Skin: greenish gold with reddish-orange streaks
+Flesh: pale
+Texture: crisp
+Taste: sweet and slightly tangy
+
+ 
+
+Delicious snack & salad apple.
+Skin: Whitish yellow with red streaks
+Flesh: White
+Texture: Crispy, crunchy & juicy
+Taste: Very sweet & fragrant
+
+ 
+
+Snacking, salad and baking apple.
+Skin: Pretty pink
+Flesh: Whitish
+Texture: Crisp and fizzy
+Taste: Tangy & sweet
+
+ 
+
+Multi-purpose apple.
+Skin: Striking red on yellow background
+Flesh: Whitish
+Texture: Juicy
+<<<<<<< HEAD
+Taste: Sweet and tart",,400,South Africa,50,Container,FOOD_BEVERAGE,,,218.239.246.20,,,0.5,1,,jooyoungyoon,
+=======
+Taste: Sweet and tart",,400,South Africa,50,Container,FOOD_BEVERAGE,,,218.239.246.20,,,0.5,1,,jooyoungyoon,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+8,FO00008-20240409,"Purchase Quality Fresh Pineapples Quality Fresh Wholesale Fresh Pineapple,BEST PRICE FRESH PINEAPPLE","Product Name: Pineapple 
+
+Flavor: Sweetener
+
+Package: As per customer requirement
+
+MOQ:As per customer requirement
+
+Delivery Time:10 Business Days
+
+Payment Terms: Western Union, Money Gram, Bank Transfer, Credit Card, Cash
+
+Supply Ability: As per customer requirement 
+
+Product Type: Tropical Fruit
+
+Type: Mini Pineapple
+
+Style: Fresh
+
+Cultivation Type: Common
+
+Variety: Phule (Mini Pineapple)
+
+Certification: GMP, GAP
+
+Place of Origin: USA
+
+Grade: Premium
+
+Available Season: Almost Year Round
+
+Peak Period: N/A (The Lowest Price is in June.)
+
+Shelf Life:7 Days from Packing Date
+
+Packing : Material & Weight
+
+Corrugated Paper Box
+
+Net Weight:9.0 Kg/Box
+
+Gross Weight:10.0 kg/Box
+
+Fruit Size:  Size 2 = 0.5 kg/Piece
+
+                   Size 3 = 0.3 kg/Piece
+
+                   Size 4 = 0.25 kg/Piece
+
+<<<<<<< HEAD
+                   Size 5 = 0.2 kg/Piece",,300,United States,27,Ton,Food&Beverage,,,170.171.1.255,,,0.5,1,,inyoungkim,
+9,FO00009-20240409,Orecchiette Organic Artisan Pasta 100% Made in Italy,ORECCHIETTE DI MATERA PASTA ARTIGIANALE BIOLOGICA CERTIFICATA 100% ITALIANA. ESSICCAZIONE LENTA E PRODUZIONE A BASSA TEMPERATURA.TEMPO DI COTTURA CIRCA 13 MINUTI.CONFEZIONI DA 500G.DATA DI SCADENZA 3 ANNI.,,2,Italy,15,Piece,Food&Beverage,,,80.207.161.250,,,0.5,1,,asifiyah,
+10,FO00010-20240409,Ciroc Vodka 750ML,"France- Derived from ""snap frost"" grapes; Mauzac Blanc from the Gaillac region of France, and Ugni Blanc from the Cognac region. The juice extracted from these is fermented cold to preserve freshness, fruit character and sweet ripeness. Distilled 5 times. Uniquely crisp and clean.",,15,Romania,100,Unit,FOOD_BEVERAGE,,,86.106.34.164,,,0.5,1,,my04202298,
+=======
+                   Size 5 = 0.2 kg/Piece",,300,United States,27,Ton,Food&Beverage,,,170.171.1.255,,,0.5,1,,inyoungkim,
+9,FO00009-20240409,Orecchiette Organic Artisan Pasta 100% Made in Italy,ORECCHIETTE DI MATERA PASTA ARTIGIANALE BIOLOGICA CERTIFICATA 100% ITALIANA. ESSICCAZIONE LENTA E PRODUZIONE A BASSA TEMPERATURA.TEMPO DI COTTURA CIRCA 13 MINUTI.CONFEZIONI DA 500G.DATA DI SCADENZA 3 ANNI.,,2,Italy,15,Piece,Food&Beverage,,,80.207.161.250,,,0.5,1,,asifiyah,
+10,FO00010-20240409,Ciroc Vodka 750ML,"France- Derived from ""snap frost"" grapes; Mauzac Blanc from the Gaillac region of France, and Ugni Blanc from the Cognac region. The juice extracted from these is fermented cold to preserve freshness, fruit character and sweet ripeness. Distilled 5 times. Uniquely crisp and clean.",,15,Romania,100,Unit,FOOD_BEVERAGE,,,86.106.34.164,,,0.5,1,,my04202298,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+11,CH00001-20240409,Wasabi Powder,"1. Product features: Add an appropriate amount of water and use it well. If you use it in sashimi, sushi, fish skewers, fish cakes, and other dishes, it will enhance the flavor even more.  
+
+2. Raw materials and ingredients: Wasabi powder 90% (from China), mustard flour (from Canada, USA), potato starch, citric acid, vitamin C *Synthetic colorants: yellow No. 4 0.01%, blue No. 1 0.005%
+
+<<<<<<< HEAD
+3. Storage method: Store in a dry and cool place and seal after opening. (Shelf life 24 months)",,10.44,Korea,40,box,CHEMICAL,,,218.239.246.20,,,0.4,1,,heejinkim,
+12,CH00002-20240409,Ethanol Ethyl Alcohol in IBC Intermadiate Bulk,"Ethanol is a flammable, commonly used fuel, solvent and disinfectant and is also used to make other compounds. Industrial alcohol contains a small amount of methanol. Medical alcohol mainly refers to ethanol with a concentration of about 75%, and also includes other concentrations of alcohol widely used in medicine.
+
+Ethanol and methyl ether are isomers.",,750,Brazil,500,Stone,CHEMICAL,,,143.137.196.0,,,0.7,1,,okextruder,
+13,CH00003-20240409,Factory Supply Sodium Carbonate Na2co3 Soda Ash Dense/Light Used in Metallurgy Industry,"Soda ash dense, also known as dense soda ash or sodium carbonate, is a chemical compound with the formula Na2CO3. It is a white, odorless powder that is widely used in various industries due to its versatility and chemical properties. Here are some key points about soda ash dense:",,200,Canada,5,Ton,CHEMICAL,,,157.185.144.90,,,0.7,1,,edward9011,
+=======
+3. Storage method: Store in a dry and cool place and seal after opening. (Shelf life 24 months)",,10.44,Korea,40,box,CHEMICAL,,,218.239.246.20,,,0.4,1,,heejinkim,
+12,CH00002-20240409,Ethanol Ethyl Alcohol in IBC Intermadiate Bulk,"Ethanol is a flammable, commonly used fuel, solvent and disinfectant and is also used to make other compounds. Industrial alcohol contains a small amount of methanol. Medical alcohol mainly refers to ethanol with a concentration of about 75%, and also includes other concentrations of alcohol widely used in medicine.
+
+Ethanol and methyl ether are isomers.",,750,Brazil,500,Stone,CHEMICAL,,,143.137.196.0,,,0.7,1,,okextruder,
+13,CH00003-20240409,Factory Supply Sodium Carbonate Na2co3 Soda Ash Dense/Light Used in Metallurgy Industry,"Soda ash dense, also known as dense soda ash or sodium carbonate, is a chemical compound with the formula Na2CO3. It is a white, odorless powder that is widely used in various industries due to its versatility and chemical properties. Here are some key points about soda ash dense:",,200,Canada,5,Ton,CHEMICAL,,,157.185.144.90,,,0.7,1,,edward9011,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+14,CH00004-20240409,Barium Sulphate Precipitated,"Molecular formula: BaSO4
+English name: Barium sulphate precipitated
+CAS No.: 7727-43-7
+
+EC No.:231-784-4
+Molecular weight: 233.40
+Performance characteristics:
+It is white powder or paste, non-toxic, unsoluble in water, but soluble in fuming sulfuric acid, slightly soluble in boiling hydrochloric acid. The chemical property is stable.
+Use: It is filler of paint, printing ink, rubber, plastic and insulating tape, also used in pigment, ceramics, accumulator cell, enamelware, glass and spice.
+
+Product quality: GB/T2899-2017
+Main content(on BaSO4 basis) 98.0% min.
+
+Volatile at 105℃ 0.20% max.
+
+Water soluble matters 0.10% max.
+
+Iron (on Fe basis) 0.003% max.
+
+Whiteness 97 min.
+
+Oil absorption  (g/100g) 13-17  
+
+pH value (10% suspension ) 6.5-8.0
+
+Fineness ( 45μm sieve residue)   0.10% max.
+
+Sulphide (on S basis) 0.002% max.
+
+<<<<<<< HEAD
+ Average particle size (D50) (μm) 0.6-0.8",,500,China,20,Ton,CHEMICAL,,,118.249.41.255,,,0.6,1,,hznaxinda,
+15,CH00005-20240409,Xylene,"Our company are specializing in manufacturing and exporting chemical products. We can supply Xylene high quality and reasonable price. If you are interested in our products or our company, please feel free to contact us for more information and specification.We are sure that you will be satisfied with our products and our service.",,600,South Africa,100,Ton,CHEMICAL,,,196.21.247.1,,,0.7,1,,henzevalves,
+16,CH00006-20240409,Petroleum Jelly Industrial Grade,"industry has large quantity request for Vaseline these days , this grade is white or yellow since color is not so important.",,1000,Iran,100,Ton,CHEMICAL,,,109.74.232.0,,,0.6,1,,vn04174977,
+17,CH00007-20240409,Colloidal Silica for Foundries and Casting,"HS-830 Colloidal Silica is an alkaline, aqueous dispersion of colloidal silica with 29-31% silica (SiO2) by weight with an average particle size from 8 to 10 nm. The silica dispersion is sodium stabilized, with a pH value ranging from 9.0 to 10.5. The physical appearance of HS-1430 is a translucent liquid, slightly more viscous than water. Applications: HS-830 is a generalist product designed to offer high versatility, excellent stability, and exceptional cost-effectiveness for various applications. It is commonly used as a binder or surface modifier across a wide range of industries.",,750,United States,2,Ton,CHEMICAL,,,170.171.1.255,,,0.6,1,,specialtycare,
+=======
+ Average particle size (D50) (μm) 0.6-0.8",,500,China,20,Ton,CHEMICAL,,,118.249.41.255,,,0.6,1,,hznaxinda,
+15,CH00005-20240409,Xylene,"Our company are specializing in manufacturing and exporting chemical products. We can supply Xylene high quality and reasonable price. If you are interested in our products or our company, please feel free to contact us for more information and specification.We are sure that you will be satisfied with our products and our service.",,600,South Africa,100,Ton,CHEMICAL,,,196.21.247.1,,,0.7,1,,henzevalves,
+16,CH00006-20240409,Petroleum Jelly Industrial Grade,"industry has large quantity request for Vaseline these days , this grade is white or yellow since color is not so important.",,1000,Iran,100,Ton,CHEMICAL,,,109.74.232.0,,,0.6,1,,vn04174977,
+17,CH00007-20240409,Colloidal Silica for Foundries and Casting,"HS-830 Colloidal Silica is an alkaline, aqueous dispersion of colloidal silica with 29-31% silica (SiO2) by weight with an average particle size from 8 to 10 nm. The silica dispersion is sodium stabilized, with a pH value ranging from 9.0 to 10.5. The physical appearance of HS-1430 is a translucent liquid, slightly more viscous than water. Applications: HS-830 is a generalist product designed to offer high versatility, excellent stability, and exceptional cost-effectiveness for various applications. It is commonly used as a binder or surface modifier across a wide range of industries.",,750,United States,2,Ton,CHEMICAL,,,170.171.1.255,,,0.6,1,,specialtycare,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+18,CH00008-20240409,Best-Selling Lily Scent Overwhelming Quality Automobile Air Freshener Spray,"Usage
+
+1. Shake the can well first and then hold it upright
+2. Press the button
+3. Spray around the room in the space just for a few seconds
+Precaution
+1. It should be kept in cool-dry place under 50°C
+2. It should be kept beyond the reach of the children.
+3. Don't use it near the fire
+<<<<<<< HEAD
+",,6.17,China,4200,Dozen,CHEMICAL,,,118.249.41.255,,,0.5,1,,hznaxinda,
+=======
+",,6.17,China,4200,Dozen,CHEMICAL,,,118.249.41.255,,,0.5,1,,hznaxinda,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+19,CH00009-20240409,Prodigy Test Strips Box of 50 Count,"KINDLY CONTACT US ON WHATSAPP +1(706)622-6924 TO PLACE ORDER
+
+we deliver  to your doorstep/warehouse.
+
+<<<<<<< HEAD
+For new and old existing Amazon supplies we do deliver to amazon warehouse and also can help you out with your account , kindly reach out to us on WhatsApp to make your order, as we assure you the best service experience.",,100,United States,4,Unit,CHEMICAL,,,170.171.1.255,,,0.4,1,,specialtycare,
+=======
+For new and old existing Amazon supplies we do deliver to amazon warehouse and also can help you out with your account , kindly reach out to us on WhatsApp to make your order, as we assure you the best service experience.",,100,United States,4,Unit,CHEMICAL,,,170.171.1.255,,,0.4,1,,specialtycare,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+20,CH00010-20240409,"Kate Blanc Cosmetics Castor Oil (2oz), USDA Certified Organic, 100% Pure","send us a text message or call us directly for fast response .
+WHATSAPP NUMBER: :+19045301466
+CALLING NUMBER : +19045301466
+TEXT MESSAGE NUMBER : +19045301466
+<<<<<<< HEAD
+BUY 50 UNITS GET 10 UNITS FREE ",,4,United States,50,Unit,CHEMICAL,,,170.171.1.255,,,0.5,1,,specialtycare,
+21,HE00001-20240409,Medical Face Mask,"Product Name: Medical Face Mask Size: 17.5*9.5CM Material: Non Woven Color: Blue,Black,White or Custom Is product customizable? Yes Price: Currency: USD Price Range: 0.005-0.01 Unit: Per Piece Min. order: 1000pcs Production time: Quantity:100000pcs Estimated lead time (days): 7days Supply capability: quantity: 10000000 Pieces time: 30days Product classification: Non Woven",,0.01,Philippines,1000Pieces,,HEALTH_MEDICAL,,,103.100.136.0,,,0.5,1,,juujee07,
+22,HE00002-20240409,Front-Wheel Drive Motor Electric Power Standing Up Wheelchair for Rehabilitation Therapy Supplies,"This wheelchair is equipped with electric standing and front-wheel drive systems. Users can not only stand, but also walk while standing, increasing the user's independence and social interaction.",,2350,China,1,Set,HEALTH_MEDICAL,,,118.249.41.255,,,0.3,1,,hznaxinda,
+23,HE00003-20240409,Disposable Surgical Gown,"1. The product is only limited for disposable use and should be discarded into medical trash cans after use. 
+2. If the product is found to be contaminated or damaged before use, please stop using it immediately and dispose of it properly. 
+3. The product should avoid prolonged contact with chemical substances. 
+4. The product is a non-sterilized, non-flame-retardant product and should be kept away from heat sources and open flames during use or storage.",,0.95,China,100000,Piece,HEALTH_MEDICAL,,,119.181.55.172,,,0.4,1,,king9jinglin,
+24,HE00004-20240409,FUA Medical Gauze Swab with X-ray 10cmX10cm,"This product is a sterile gauze pad commonly used in medical settings. Its 10cm x 10cm or 7.5cm x 7.5cm dimensions make it suitable for wound care. Additionally, it contains a special substance that can be detected by X-ray machines, allowing medical personnel to easily identify it in cases that require radiological examination.
+
+This gauze swab is ideal for use in wound care and surgical procedures. It is sterilely packaged and designed for single-use, minimizing the risk of infection. The 10cm x 10cm or 7.5cm x 7.5cm X-ray detectable medical gauze swab is made from high-quality materials and designed to effectively control bleeding and prevent infections.7.5cm x 7.5cm10cmX10cm",,0.5,Turkey,3000,Piece,HEALTH_MEDICAL,,,85.110.75.46,,,0.5,1,,linanson721,
+25,HE00005-20240409,Advantage Foldable Dental Chair for Sale MSLDU19,"Could you contcct our sale manager.we will tell you the price,Please see our contact.
+SKYPE:cindyljc
+Mobile:+86 138 2644 8637
+http:// www. medicalequipment-msl.com",,700,China,1,Set,HEALTH_MEDICAL,,,119.181.55.172,,,0.5,1,,king9jinglin,
+26,HE00006-20240409,Braun Thermo Scan 7 Ear Thermometer IRT6520,Brand new Braun ThermoScan 7 IRT-6520 in factory sealed boxes offered at wholesale price for bulk orders. Contact us for more details. Thank you,,20,United Kingdom,5000,Unit,HEALTH_MEDICAL,,,178.238.11.6,,,0.7,1,,vn04174929,
+=======
+BUY 50 UNITS GET 10 UNITS FREE ",,4,United States,50,Unit,CHEMICAL,,,170.171.1.255,,,0.5,1,,specialtycare,
+21,HE00001-20240409,Medical Face Mask,"Product Name: Medical Face Mask Size: 17.5*9.5CM Material: Non Woven Color: Blue,Black,White or Custom Is product customizable? Yes Price: Currency: USD Price Range: 0.005-0.01 Unit: Per Piece Min. order: 1000pcs Production time: Quantity:100000pcs Estimated lead time (days): 7days Supply capability: quantity: 10000000 Pieces time: 30days Product classification: Non Woven",,0.01,Philippines,1000Pieces,,HEALTH_MEDICAL,,,103.100.136.0,,,0.5,1,,juujee07,
+22,HE00002-20240409,Front-Wheel Drive Motor Electric Power Standing Up Wheelchair for Rehabilitation Therapy Supplies,"This wheelchair is equipped with electric standing and front-wheel drive systems. Users can not only stand, but also walk while standing, increasing the user's independence and social interaction.",,2350,China,1,Set,HEALTH_MEDICAL,,,118.249.41.255,,,0.3,1,,hznaxinda,
+23,HE00003-20240409,Disposable Surgical Gown,"1. The product is only limited for disposable use and should be discarded into medical trash cans after use. 
+2. If the product is found to be contaminated or damaged before use, please stop using it immediately and dispose of it properly. 
+3. The product should avoid prolonged contact with chemical substances. 
+4. The product is a non-sterilized, non-flame-retardant product and should be kept away from heat sources and open flames during use or storage.",,0.95,China,100000,Piece,HEALTH_MEDICAL,,,119.181.55.172,,,0.4,1,,king9jinglin,
+24,HE00004-20240409,FUA Medical Gauze Swab with X-ray 10cmX10cm,"This product is a sterile gauze pad commonly used in medical settings. Its 10cm x 10cm or 7.5cm x 7.5cm dimensions make it suitable for wound care. Additionally, it contains a special substance that can be detected by X-ray machines, allowing medical personnel to easily identify it in cases that require radiological examination.
+
+This gauze swab is ideal for use in wound care and surgical procedures. It is sterilely packaged and designed for single-use, minimizing the risk of infection. The 10cm x 10cm or 7.5cm x 7.5cm X-ray detectable medical gauze swab is made from high-quality materials and designed to effectively control bleeding and prevent infections.7.5cm x 7.5cm10cmX10cm",,0.5,Turkey,3000,Piece,HEALTH_MEDICAL,,,85.110.75.46,,,0.5,1,,linanson721,
+25,HE00005-20240409,Advantage Foldable Dental Chair for Sale MSLDU19,"Could you contcct our sale manager.we will tell you the price,Please see our contact.
+SKYPE:cindyljc
+Mobile:+86 138 2644 8637
+http:// www. medicalequipment-msl.com",,700,China,1,Set,HEALTH_MEDICAL,,,119.181.55.172,,,0.5,1,,king9jinglin,
+26,HE00006-20240409,Braun Thermo Scan 7 Ear Thermometer IRT6520,Brand new Braun ThermoScan 7 IRT-6520 in factory sealed boxes offered at wholesale price for bulk orders. Contact us for more details. Thank you,,20,United Kingdom,5000,Unit,HEALTH_MEDICAL,,,178.238.11.6,,,0.7,1,,vn04174929,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+27,HE00007-20240409,Bath Salt (Epsom Salt Bath) Aromatherapy Scented Natural Relaxing Organic Salt,"Chemical Analysis for Bath Salt:
+
+✔️NaCl (on dry basis)= 98.839 %
+
+✔️Insoluble matter= 0.116 %
+
+✔️Moisture=0.160 %
+
+✔️Bicarbonate=0.049 %
+
+✔️Sulphate=0.440 %
+
+✔️Calcium=0.088 %
+
+<<<<<<< HEAD
+✔️Magnesium=0.170 %",,86,Egypt,28,Ton,HEALTH_MEDICAL,,,101.44.232.0,,,0.4,1,,juujee07,
+=======
+✔️Magnesium=0.170 %",,86,Egypt,28,Ton,HEALTH_MEDICAL,,,101.44.232.0,,,0.4,1,,juujee07,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+28,HE00008-20240409,Tea Tree Esential Oil Pure,"Skin care 1. Dandruff - It is recommended to use shampoo containing tea tree essential oil, or drop 10 drops of tea tree essential oil on the scalp before the hair is dried after washing. The effect is best, but do not rub or press vigorously when applying.
+
+2. Lipid leaking dermatitis (or tinea inguinalis) - most often occurs on the scalp, neck, back and lower part of the body. It is recommended to use a bath cream containing tea tree essential oil to wash the skin, then apply tea tree essential oil to the affected part and massage it slightly, because the antibacterial soothing effect and natural penetration of tea tree essential oil can ease redness, swelling and itching. As the general ointment often adds steroids, which is bad for the body, it is better to smear tea tree essential oil.
+
+<<<<<<< HEAD
+3. Acne -- Tea tree essential oil has antibacterial and anti-inflammatory effects, which can quickly penetrate into hair follicles for conditioning. Apply 1-2 drops of tea tree essential oil to acne parts at a time, and use a small amount for many times.",,80,China,50,Liter,HEALTH_MEDICAL,,,119.181.55.172,,,0.3,1,,laserdow,
+=======
+3. Acne -- Tea tree essential oil has antibacterial and anti-inflammatory effects, which can quickly penetrate into hair follicles for conditioning. Apply 1-2 drops of tea tree essential oil to acne parts at a time, and use a small amount for many times.",,80,China,50,Liter,HEALTH_MEDICAL,,,119.181.55.172,,,0.3,1,,laserdow,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+29,HE00009-20240409,"Stair Assist Cane, Cane for Stairs, Cane On Stairs, Going Upstairs Cane","Stair Assist Cane - A perfect cane for going upstairs and downstairs
+
+
+
+Stair Assist Cane is an innovative design. It supports seniors by increasing the stability while they're climbing stairs.
+<<<<<<< HEAD
+",,22,China,500,Piece,HEALTH_MEDICAL,,,118.249.214.46,,,0.4,1,,laserdow,
+30,HE00010-20240409,Mounjaro Tirzepatide Injection,".Tirzepatide Injection Mounjaro Tirzepatide Injection (2.5mg,5mg,7.5mg,10mg,12.5mg,15mg) / 0.5ml ; Strength. 5 mg ; Packaging Size. 0.5 ml ; Packaging Type. Injection ; Brand. Mounjaro.
+
+Mounjaro®(mown-JAHR-OH) is an injectable medicine for adults with type 2 diabetes used along with diet and exercise to improve blood sugar (glucose).",,150,India,10,Box,HEALTH_MEDICAL,,,101.33.2.0,,,0.7,1,,in04174941,
+31,EL00001-20240409,Play_Station_5_New_and_Sealed_in_Box,STOCKS AVAILABLE FOR FEDEX OR DHL DELIVERY WORLDWIDE 100% Safe Delivery 100% Products Quality Production 100% On-Time Shipment Protection 100% Payment Protection We offer free shipping and delivery to all customers. Delivery is made directly to your doorstep. Delivery takes just 3-5 working days. No custom troubles. ORDER WITH 100% TRADE ASSURANCE Kindly contact me on WhatsApp +44(7440160693) for more information,,100,United States,10,Unit,ELECTRONICS,,,170.171.1.255,,,0.9,0,,asifiyah,
+=======
+",,22,China,500,Piece,HEALTH_MEDICAL,,,118.249.214.46,,,0.4,1,,laserdow,
+30,HE00010-20240409,Mounjaro Tirzepatide Injection,".Tirzepatide Injection Mounjaro Tirzepatide Injection (2.5mg,5mg,7.5mg,10mg,12.5mg,15mg) / 0.5ml ; Strength. 5 mg ; Packaging Size. 0.5 ml ; Packaging Type. Injection ; Brand. Mounjaro.
+
+Mounjaro®(mown-JAHR-OH) is an injectable medicine for adults with type 2 diabetes used along with diet and exercise to improve blood sugar (glucose).",,150,India,10,Box,HEALTH_MEDICAL,,,101.33.2.0,,,0.7,1,,in04174941,
+31,EL00001-20240409,Play_Station_5_New_and_Sealed_in_Box,STOCKS AVAILABLE FOR FEDEX OR DHL DELIVERY WORLDWIDE 100% Safe Delivery 100% Products Quality Production 100% On-Time Shipment Protection 100% Payment Protection We offer free shipping and delivery to all customers. Delivery is made directly to your doorstep. Delivery takes just 3-5 working days. No custom troubles. ORDER WITH 100% TRADE ASSURANCE Kindly contact me on WhatsApp +44(7440160693) for more information,,100,United States,10,Unit,ELECTRONICS,,,170.171.1.255,,,0.9,0,,asifiyah,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+32,EL00002-20240409,DisplayPort To HDMI Cable,"PREMIUM CABLETIME  DisplayPort To  HDMI  Cable, DP Male To HDMI  Male , Support Ultra HD 4K/30HZ  (3840*2160p),PVC with Nylon Jacket , WITH LED
+
+1. Input: DP Male, Gold
+2. Output: HDMI Male, Gold
+3. AUDIO/VIDEO 3840*2160P/30HZ
+4.Chipset: PS8402
+5.Shell: Alumiunm Shell with LED
+6.Wire：UL 32AWG 5P+5C with ALMlar+ 85% Braiding OD5.2mm , Flexilble matt PVC
+7.Jacket: BLACK PVC + NYLON
+<<<<<<< HEAD
+8.OD：5.2mm",,5.99,China,10,Piece,ELECTRONICS,,,118.249.214.46,,,0.6,1,,laserdow,
+33,EL00003-20240409,"100% Free Shipping Mobile Iphons 14,12,11 Pro Max 1TB Super Retina OLED Display Unlocked Phoneing","We sell at best prices and our vehicles has no defect, has clean title and no accident. We deliver the car to preferred
+destination",,300,United States,1,Unit,ELECTRONICS,,,170.171.1.255,,,0.91,0,,asifiyah,
+34,EL00004-20240409,AppleIPhone 15 Pro Max 512GB,"The AppleiPhone 15 Pro max has a titanium Frame. It has a 6.7 inches LTPO Super Retina XDR OLED display with 120Hz refresh rate, This Phone is Powered by hexa core CPU based on the A17 Pro (3 nm) chipset. It has 8GB of RAM and up to 256GB of internal storage. The Quad camera setup on the back includes 48+ 12 +12 MP + TOF. and 12MP Front Camera. The device has power packed 4852mAh battery that sports a 45W wired and 15W wireless (MagaSafe) charger.",,599,United States,1,Box,ELECTRONICS,,,170.171.1.255,,,0.92,0,,asifiyah,
+=======
+8.OD：5.2mm",,5.99,China,10,Piece,ELECTRONICS,,,118.249.214.46,,,0.6,1,,laserdow,
+33,EL00003-20240409,"100% Free Shipping Mobile Iphons 14,12,11 Pro Max 1TB Super Retina OLED Display Unlocked Phoneing","We sell at best prices and our vehicles has no defect, has clean title and no accident. We deliver the car to preferred
+destination",,300,United States,1,Unit,ELECTRONICS,,,170.171.1.255,,,0.91,0,,asifiyah,
+34,EL00004-20240409,AppleIPhone 15 Pro Max 512GB,"The AppleiPhone 15 Pro max has a titanium Frame. It has a 6.7 inches LTPO Super Retina XDR OLED display with 120Hz refresh rate, This Phone is Powered by hexa core CPU based on the A17 Pro (3 nm) chipset. It has 8GB of RAM and up to 256GB of internal storage. The Quad camera setup on the back includes 48+ 12 +12 MP + TOF. and 12MP Front Camera. The device has power packed 4852mAh battery that sports a 45W wired and 15W wireless (MagaSafe) charger.",,599,United States,1,Box,ELECTRONICS,,,170.171.1.255,,,0.92,0,,asifiyah,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+35,EL00005-20240409,Samsung UN60ES6100 60-Inch 1080p 240 LED HDTV,"Product Features
+·Smart TV
+·Signature Services
+·Built-in WiFi
+·ConnectShare Movie
+·AllShare Play
+Technical Details
+·Brand Name: Samsung
+·Model: UN60ES6100
+·Display Technology: LED-lit
+·Display Size: 60 inches
+·Image Aspect Ratio: 16:09
+Product Details
+·Product Dimensions: 12.2 x 54.1 x 34.5 inches ; 59.1 pounds
+·Shipping Weight: 60 pounds
+·ASIN: B0079EVQ2Q
+<<<<<<< HEAD
+·Item model number: UN60ES6100",,366,China,1,Unit,ELECTRONICS,,,118.249.214.46,,,0.93,0,,glonria18,
+36,EL00006-20240409,Solarparts Flexible Solar Panel 100w/19.8v 1060*530*3mm,"Our solar panels are certified by FCC, RoHS, CE, ISO, IEC. Advanced Security, Qualified quality, Environmental protection, and energy- saving. Made with SP highest-efficiency solar cells, our Solarparts@_Flexible Series Solar Panel delivers the most power and highest charging efficiency in their product class. SP cells are different from conventional cells. Traditional cells are prone to cracking when bent or impacted, resulting in power loss, but flexible panels made with SP cells can resist power loss due to bending and squeezing. Solarparts@_Flexible Series Solar Panels are the best choice for customers due to the combination of high power and cell ruggedness.",,49,China,100,Piece,ELECTRONICS,,,182.39.189.218,,,0.4,1,,glonria18,
+=======
+·Item model number: UN60ES6100",,366,China,1,Unit,ELECTRONICS,,,118.249.214.46,,,0.93,0,,glonria18,
+36,EL00006-20240409,Solarparts Flexible Solar Panel 100w/19.8v 1060*530*3mm,"Our solar panels are certified by FCC, RoHS, CE, ISO, IEC. Advanced Security, Qualified quality, Environmental protection, and energy- saving. Made with SP highest-efficiency solar cells, our Solarparts@_Flexible Series Solar Panel delivers the most power and highest charging efficiency in their product class. SP cells are different from conventional cells. Traditional cells are prone to cracking when bent or impacted, resulting in power loss, but flexible panels made with SP cells can resist power loss due to bending and squeezing. Solarparts@_Flexible Series Solar Panels are the best choice for customers due to the combination of high power and cell ruggedness.",,49,China,100,Piece,ELECTRONICS,,,182.39.189.218,,,0.4,1,,glonria18,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+37,EL00007-20240409,Hansheng Power Tools Electric Demolition,"Electric Breaker Heavy Duty Concrete Crusher
+
+We offer electric demolition electric jack hammer demolition hammer.
+
+<<<<<<< HEAD
+We have been committed to the development of power tools for many years, and our business covers most of Europe, Asia, Oceania, South America and African markets. We look forward to becoming your long-term partner in China.",,86,China,200,Piece,ELECTRONICS,,,182.39.189.218,,,0.3,1,,glonria18,
+38,EL00008-20240409,Laptop for Gamming,"Apple mackbook pro 7th generation in sealed pack box and warranty with free delivery to your home address.
+
+product comes with complete pack box",,270,Chile,2,Box,ELECTRONICS,,,166.110.255.255,,,0.94,0,,xt2612,
+=======
+We have been committed to the development of power tools for many years, and our business covers most of Europe, Asia, Oceania, South America and African markets. We look forward to becoming your long-term partner in China.",,86,China,200,Piece,ELECTRONICS,,,182.39.189.218,,,0.3,1,,glonria18,
+38,EL00008-20240409,Laptop for Gamming,"Apple mackbook pro 7th generation in sealed pack box and warranty with free delivery to your home address.
+
+product comes with complete pack box",,270,Chile,2,Box,ELECTRONICS,,,166.110.255.255,,,0.94,0,,xt2612,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+39,EL00009-20240409,Scrap Battery Lead Acid Dry (Drained Lead Scrap Battery),"Scrap  battery  Super Lead Acid Dry 12 V drained  Battery for cars
+
+  
+
+
+
+1.Tech Specification
+ 
+
+1. Capacity.: 36AH to 220ah
+
+2. Voltage: 12V
+
+3. Applications: starting battery for cars, buses, trucks and other vehicles
+
+4. Certificate: ISO, CE, SASO, SONCAP etc
+
+<<<<<<< HEAD
+5. Packaging: cartons & pallets",,220,Thailand,27,Ton,ELECTRONICS,,,101.108.143.79,,,0.6,1,,xt2612,
+40,EL00010-20240409,Greenworks 24V Speed Cordless 90130MPH Leaf Blower with Battery and Charger,"* This product is guaranteed to work perfectly in good condition. If for some reason you are unhappy with your purchase notify us within 90 days after you receive the item.
+
+* All returned items must be in their original condition ",,30,United States,4,Unit,ELECTRONICS,,,170.171.1.255,,,0.4,1,,asifiyah,
+41,CO00001-20240409,Dr.Lee Flower Ampoule Series,"Dr. Lee is a Medical Beauty Brand founded by dermatologist who worked for 30years in that field.
+
+Also he founded Lee Ji Ham dermatologist & Cosmetics that specialize in trouble care such as acne treatment.",,13,Korea,3000,Carton,COSMETIC,,,218.239.246.20,,,0.3,1,,doyeonkim,
+42,CO00002-20240409,Manla Kar,"Manla Kar Collagen is a high-purity, high-concentration collagen that is closest to the natural form of collagen. It is also a multi-collagen that is naturally absorbed into the skin and freely fused between cells. It promotes skin regeneration, supplies nutrients and moisture, and activates cell metabolism to make the skin shiny and elastic.",,35,Korea,1,Box,COSMETIC,,,218.239.246.20,,,0.6,1,,doyeonkim,
+43,CO00003-20240409,Nars Light Reflecting Foundation MONT BLANC Light Authentic New,"ORDER NOW AND GET YOUR 10% DISCOUNT FREE
+
+100% Guaranteed Fast shipping",,3,United States,500,Unit,COSMETIC,,,170.171.1.255,,,0.3,1,,goldspread8,
+=======
+5. Packaging: cartons & pallets",,220,Thailand,27,Ton,ELECTRONICS,,,101.108.143.79,,,0.6,1,,xt2612,
+40,EL00010-20240409,Greenworks 24V Speed Cordless 90130MPH Leaf Blower with Battery and Charger,"* This product is guaranteed to work perfectly in good condition. If for some reason you are unhappy with your purchase notify us within 90 days after you receive the item.
+
+* All returned items must be in their original condition ",,30,United States,4,Unit,ELECTRONICS,,,170.171.1.255,,,0.4,1,,asifiyah,
+41,CO00001-20240409,Dr.Lee Flower Ampoule Series,"Dr. Lee is a Medical Beauty Brand founded by dermatologist who worked for 30years in that field.
+
+Also he founded Lee Ji Ham dermatologist & Cosmetics that specialize in trouble care such as acne treatment.",,13,Korea,3000,Carton,COSMETIC,,,218.239.246.20,,,0.3,1,,doyeonkim,
+42,CO00002-20240409,Manla Kar,"Manla Kar Collagen is a high-purity, high-concentration collagen that is closest to the natural form of collagen. It is also a multi-collagen that is naturally absorbed into the skin and freely fused between cells. It promotes skin regeneration, supplies nutrients and moisture, and activates cell metabolism to make the skin shiny and elastic.",,35,Korea,1,Box,COSMETIC,,,218.239.246.20,,,0.6,1,,doyeonkim,
+43,CO00003-20240409,Nars Light Reflecting Foundation MONT BLANC Light Authentic New,"ORDER NOW AND GET YOUR 10% DISCOUNT FREE
+
+100% Guaranteed Fast shipping",,3,United States,500,Unit,COSMETIC,,,170.171.1.255,,,0.3,1,,goldspread8,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+44,CO00004-20240409,Neutrogena Makeup Remover Wipes Singles Daily Facial Cleanser Towelettes Gently Removes Oil & Make,"for any information on order please kindly contact ON WHATSAPP +1(706)538-8133 .
+
+
+
+<<<<<<< HEAD
+Neutrogena Makeup Remover Wipes Singles Daily Facial Cleanser Towelettes Gently Removes Oil & Make",,1,United States,500,Unit,COSMETIC,,,170.171.1.255,,,0.5,1,,goldspread8,
+=======
+Neutrogena Makeup Remover Wipes Singles Daily Facial Cleanser Towelettes Gently Removes Oil & Make",,1,United States,500,Unit,COSMETIC,,,170.171.1.255,,,0.5,1,,goldspread8,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+45,CO00005-20240409,Essence Lash Mascara Black Brown Color,"
+send us a text message or call us directly for fast response .
+
+
+
+
+
+<<<<<<< HEAD
+WHATSAPP NUMBER: :+19045301466",,2,United States,50,Unit,COSMETIC,,,170.171.1.255,,,0.4,1,,goldspread8,
+46,CO00006-20240409,ETUDE HOUSE Play Color Eyes #Pink Muhly Romance,Autumn pink muhly 9-COLOR EYE SHADOW palette invites new romance by coloring the eyes with romantic mood and sunset glow to fit everyone,,10,United States,100,Unit,COSMETIC,,,170.171.1.255,,,0.6,1,,jooyoungyoon,
+=======
+WHATSAPP NUMBER: :+19045301466",,2,United States,50,Unit,COSMETIC,,,170.171.1.255,,,0.4,1,,goldspread8,
+46,CO00006-20240409,ETUDE HOUSE Play Color Eyes #Pink Muhly Romance,Autumn pink muhly 9-COLOR EYE SHADOW palette invites new romance by coloring the eyes with romantic mood and sunset glow to fit everyone,,10,United States,100,Unit,COSMETIC,,,170.171.1.255,,,0.6,1,,jooyoungyoon,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+47,CO00007-20240409,NEW LANEIGE Lip Glowy Balm,"send us a text message or call us directly for fast response .
+
+
+
+
+
+<<<<<<< HEAD
+WHATSAPP NUMBER: :+19045301466",,2,United States,50,unit,COSMETIC,,,170.171.1.255,,,0.4,1,,jooyoungyoon,
+48,CO00008-20240409,Cover Fit Cushion,"Skin fitting lightweight product that covers flaws and pores without lifting or becoming cakey. Delicately fits along the skin texture for a smooth, non-sticky look.",,24.93,Korea,1,Piece,COSMETIC,,,218.239.246.20,,,0.3,1,,jooyoungyoon,
+49,CO00009-20240409,Black Kong Aloe Vera UV Lip Balm SPF30,"Contains moisturizing Aloe Vera. Water-resistent and sweat-proof. Protects your lips from UV rays and wind, and prevents chapping due to drying.  ",,1.25,United States,20000,Piece,COSMETIC,,,170.171.1.255,,,0.3,1,,heejinkim,
+=======
+WHATSAPP NUMBER: :+19045301466",,2,United States,50,unit,COSMETIC,,,170.171.1.255,,,0.4,1,,jooyoungyoon,
+48,CO00008-20240409,Cover Fit Cushion,"Skin fitting lightweight product that covers flaws and pores without lifting or becoming cakey. Delicately fits along the skin texture for a smooth, non-sticky look.",,24.93,Korea,1,Piece,COSMETIC,,,218.239.246.20,,,0.3,1,,jooyoungyoon,
+49,CO00009-20240409,Black Kong Aloe Vera UV Lip Balm SPF30,"Contains moisturizing Aloe Vera. Water-resistent and sweat-proof. Protects your lips from UV rays and wind, and prevents chapping due to drying.  ",,1.25,United States,20000,Piece,COSMETIC,,,170.171.1.255,,,0.3,1,,heejinkim,
+>>>>>>> 15fb48aec3b88996044c30b04e07a2761ed1910d
+50,CO00010-20240409,Matte Lipstick 6 Color,"The beau matte lipstick is creamy, never dry, matte lipsticks in 6 shades that will perfectly goes with any occasion. Load your lips with plush, pigment-rich color choosing from the new shades of Matte Lipstick.​The design is also luxurious with yellow as the main color tone, the compact lipstick body you can easily take anywhere With 6 youthful and dynamic tones to bring you a trendy style like stars.
+The matteness of the lipstick can be kept for 8 - 12 hours Although it is matte lipstick, it still has a light balm that makes you feel comfortable without having to dry lips and lumps​",,1.05,Korea,1000,Piece,COSMETIC,,,218.239.246.20,,,0.5,1,,inyoungkim,

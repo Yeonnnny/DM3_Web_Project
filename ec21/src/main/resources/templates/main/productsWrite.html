@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- Meta Tag -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name='copyright' content=''>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Title Tag  -->
+	<title>EC21, Global B2B Marketplace</title>
+
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" th:href="@{/main/images/ec21logo.png}">
+	<!-- Web Font -->
+	<link
+		href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+		rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+	<!-- StyleSheet -->
+	<!-- Bootstrap -->
+	<link rel="stylesheet" th:href="@{/main/css/bootstrap.css}">
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" th:href="@{/main/css/magnific-popup.min.css}">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" th:href="@{/main/css/font-awesome.css}">
+	<!-- Fancybox -->
+	<link rel="stylesheet" th:href="@{/main/css/fancybox.css}">
+	<!-- Themify Icons -->
+	<link rel="stylesheet" th:href="@{/main/css/themify-icons.css}">
+	<!-- Nice Select CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/niceselect.css}">
+	<!-- Animate CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/animate.css}">
+	<!-- Flex Slider CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/flex-slider.min.css}">
+	<!-- Owl Carousel -->
+	<link rel="stylesheet" th:href="@{/main/css/owl-carousel.css}">
+	<!-- Slicknav -->
+	<link rel="stylesheet" th:href="@{/main/css/slicknav.min.css}">
+
+	<!-- Eshop StyleSheet -->
+	<link rel="stylesheet" th:href="@{/main/css/reset.css}">
+	<link rel="stylesheet" th:href="@{/main/css/style.css}">
+	<link rel="stylesheet" th:href="@{/main/css/responsive.css}">
+
+	<!-- Color CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/color/color2.css}">
+
+	<link rel="stylesheet" href="" id="colors">
+
+	<!-- 240420 dy : JQuery 파일 추가 및 ajax 작업 -->
+	<script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+	<!-- CK Editor -->
+	<script th:src="@{/script/ckeditor.js}"></script>
+
+	<!-- <script>
+
+		$(function () {
+			// CKEditor 초기화 및 인스턴스 생성
+			let ckEditorInstance;
+			ClassicEditor.create(document.querySelector("#ckeditor"), {
+				language: "ko"
+			}).then(editor => {
+				// 에디터 인스턴스를 저장
+				ckEditorInstance = editor;
+				
+			}).catch(error => {
+				console.error(error);
+			});
+
+			$("#insertBtn").on("click", function () {
+				let contents = ckEditorInstance.getData().trim();
+				// DB에 저장하기 위해 CK editor에 값 넣기
+				$("#productDesc").val(contents);
+				// submit 요청
+				$("#insertForm").submit();
+
+			});
+
+			init();
+		});
+
+		function init() {
+			$.ajax({
+				url: "https://api.ip.pe.kr/json"
+			}).done(function (api) {
+				$("#remoteIp").val(api.ip);
+				$("#country").val(api.country_name.en);
+			}).fail(function () {
+				alert("로딩하는데 실패하였습니다.");
+			});
+		}
+-->
+	<script>
+			$(document).ready(function () {
+				// CKEditor 초기화
+				let ckEditorInstance;
+				ClassicEditor.create(document.querySelector("#ckeditor"), {
+					language: "ko"
+				}).then(editor => {
+					ckEditorInstance = editor;
+				}).catch(error => {
+					console.error("CKEditor error:", error);
+				});
+
+				// Insert 버튼 클릭 이벤트
+				$("#insertBtn").click(function (e) {
+					e.preventDefault(); // 기본 폼 제출 방지
+
+					// 빈 필드 검사
+					var firstEmptyInput = findFirstEmptyInput();
+					if (firstEmptyInput) {
+						alert("Please fill in the " + firstEmptyInput.label + " field.");
+						console.log(firstEmptyInput);
+						$('#' + firstEmptyInput.id).focus();
+						return; // 폼 제출 중단
+					}
+
+					// 셀렉트 박스 유효성 검사
+					var category = $("select[name='category']").val();
+					if (category === "DEFAULT" || !category.trim()) {
+						alert("Please select a valid category.");
+						$('select[name="category"]').focus();
+						return; // 폼 제출 중단
+					}
+
+					// 숫자 필드 유효성 검사
+					if (!validateNumberField("#moq")) {
+						alert("Please enter a valid quantity.");
+						$('#moq').focus(); // 숫자 필드에 포커스
+						return; // 폼 제출 중단
+					}
+
+					// CKEditor에서 텍스트 가져오기
+					let contents = ckEditorInstance.getData().trim();
+					if (!contents) {
+						alert("Please fill in the Product Description field.");
+						return; // 첫 번째 빈 필드 반환
+					}
+					$("#productDesc").val(contents); // 폼의 hidden 필드에 값 설정
+					
+
+					if (confirm("Are you sure you want to submit?")) { // 사용자의 확인을 요청
+        				$("#insertForm").submit(); // 폼 제출
+					}
+				});
+
+			// 받은 인콰이어리 개수
+			getInboxCount();
+			// IP 및 국가 정보 초기화
+			init();
+		});
+
+		// 숫자 필드 유효성 검사 함수
+		function validateNumberField(fieldId) {
+			var value = $(fieldId).val();
+			return value && !isNaN(value) && parseInt(value) > 0; // 숫자이며 0보다 큰지 확인
+		}
+
+		// 빈 필드 검사 함수
+		function findFirstEmptyInput() {
+			var requiredFields = $("#insertForm").find("input[required], select[required]");
+			var firstEmpty = null;
+
+			requiredFields.each(function () {
+				var value = $(this).val().trim(); // 공백 제거
+				if (!value) {
+					firstEmpty = {
+						id: $(this).attr("id"),
+						label: $(this).closest("tr").find("th").text() // 필드 라벨
+					};
+					return false; // 반복 중단
+				}
+			});
+
+			return firstEmpty; // 첫 번째 빈 필드 반환
+		}
+
+		// 받은 인콰이어리 개수
+		function getInboxCount() {
+			let customerId = $("#customerId").val();
+			// customerId가 anonymousUser가 아닌 경우 요청 보냄!! 
+			if (customerId !== "anonymousUser") { 
+				$.ajax({
+					url: "/main/index/getInboxCount",
+					data: { "customerId": customerId },
+					method: "GET",
+					success: function (resp) {
+						console.log(resp);
+						$("#iboxCount").text(resp);
+					}
+				});
+			}
+		}
+
+		// 초기화 함수
+		function init() {
+			$.ajax({
+				url: "https://api.ip.pe.kr/json",
+			}).done(function (api) {
+				$("#remoteIp").val(api.ip); // IP 설정
+				$("#country").val(api.country_name.en); // 국가 정보 설정
+			}).fail(function () {
+				alert("Failed to load IP and country information."); // 로딩 실패 경고
+			});
+		}
+
+	</script>
+			
+</head>
+
+<body class="js">
+	<input type="hidden" id="customerId" th:value="${#authentication.name}">
+	<!-- Preloader -->
+	<!-- <div class="preloader">
+		<div class="preloader-inner">
+			<div class="preloader-icon">
+				<span></span>
+				<span></span>
+			</div>
+		</div>
+	</div> -->
+	<!-- End Preloader -->
+
+	<!-- Header -->
+	<header class="header shop">
+		<!-- Topbar -->
+		<div class="topbar">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-4 col-md-12 col-12">
+						<!-- Top Left -->
+						<div class="top-left">
+						</div>
+						<!--/ End Top Left -->
+					</div>
+					<div class="col-lg-8 col-md-12 col-12">
+						<!-- Top Right -->
+						<div class="right-content">
+							<ul class="list-main">
+								<li sec:authorize="isAnonymous()"><i class="ti-power-off"></i><a th:href="@{/main/login}">Login</a></li>
+								<li sec:authorize="isAnonymous()"><i class="ti-user"></i><a th:href="@{/main/register}">Sign up</a></li>
+								<li sec:authorize="isAuthenticated()"><i class="ti-power-off"></i><a th:href="@{/main/logout}">Logout</a></li>
+								<li><a th:href="@{/main/myproducts(customerId=${#authentication.name})}"><i class="fa fa-user-circle-o" aria-hidden="true"></i>
+									<span sec:authorize="isAuthenticated()">[[${#authentication.name}]]</span></a></li>
+								<li><a th:href="@{/main/inbox(customerId=${#authentication.name})}" class="single-icon">
+									<i class="fa fa-envelope-o"></i>
+									<span sec:authorize="isAuthenticated()" class="total-count" id="iboxCount"></span>
+								</a>
+								</li>
+							</ul>
+						</div>
+						<!-- End Top Right -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Topbar -->
+		<div class="middle-inner">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-2 col-md-2 col-12">
+						<!-- Logo -->
+						<div class="logo">
+							<a th:href="@{/}"><img th:src="@{/main/images/ec21logo.png}" alt="logo"></a>
+						</div>
+						<!--/ End Logo -->
+						<!-- Search Form -->
+						<div class="search-top">
+							<div class="top-search"><a href="#"><i class="ti-search"></i></a></div>
+							<!-- Search Form -->
+							<div class="search-top">
+								<form class="search-form">
+									<input type="text" placeholder="Search here..." name="search">
+									<button value="search" type="submit"><i class="ti-search"></i></button>
+								</form>
+							</div>
+							<!--/ End Search Form -->
+						</div>
+						<!--/ End Search Form -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<!--/ End Header -->
+
+	<!-- Breadcrumbs -->
+	<div class="breadcrumbs">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<div class="bread-inner">
+						<ul class="bread-list">
+							<li><a th:href="@{/}">Home<i class="ti-arrow-right"></i></a></li>
+							<li class="active"><a href="#">Products</a></li>
+							<li><i class="ti-arrow-right"></i></a></li>
+							<li class="active"><a th:href="@{/main/productsWrite}">Add a New Product</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Breadcrumbs -->
+
+	<!-- myInfo -->
+	<section class="product-area shop-sidebar product-list shop section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-2 col-12 ">
+						<div id="accordion">
+							<div class="card">
+								<div class="card-header">
+									<a class="card-link" data-toggle="collapse" href="#account-category">My Account</a>
+								</div>
+								<div id="account-category" class="collapse show" data-parent="#accordion">
+									<div class="card-body">
+										<ul class="categor-list">
+											<li><a th:href="@{/main/myinfo(customerId=${#authentication.name})}">My Information</a></li>
+											<li><a th:href="@{/main/myproducts(customerId=${#authentication.name})}">My Products</a></li>
+											<li><a th:href="@{/main/productsWrite(customerId=${#authentication.name})}">Add A New</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+								<a class="collapsed card-link" data-toggle="collapse" href="#product-category">To Product</a>
+							</div>
+							<div id="product-category" class="collapse" data-parent="#accordion">
+								<div class="card-body">
+									<ul class="categor-list">
+										<li><a th:href="@{/main/list(category=total)}">All</a></li>
+										<li><a th:href="@{/main/list(category=FOOD_BEVERAGE)}">Food & Beverage</a></li>
+										<li><a th:href="@{/main/list(category=CHEMICAL)}">Chemical</a></li>
+										<li><a th:href="@{/main/list(category=HEALTH_MEDICAL)}">Health & Medical</a></li>
+										<li><a th:href="@{/main/list(category=ELECTRONIC)}">Electronics</a></li>
+										<li><a th:href="@{/main/list(category=COSMETIC)}">Cosmetic</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 사이드 바 끝-->
+
+				<div class="col-lg-9 col-12">
+					<div class="shop product-info">
+						<div class="container">
+							<div class="col-12">
+								<div class="write-form">
+									<div class="title">
+										<!-- <h2>Add A New Product</h2> -->
+										<p>Fill out each field in English ONLY.</p>
+									</div>
+
+									<form class="form" id="insertForm" method="post" th:action="@{/main/productsInsert}" enctype="multipart/form-data">
+										<table>
+											<tr>
+												<th class="form-group"><h6>Category<span>*</span></h6></th>
+												<td>
+													<select name="category" class="category" required>
+														<option selected="selected" value="DEFAULT">----------------</option>
+														<option value="FOOD_BEVERAGE">Food & Beverage</option>
+														<option value="CHEMICAL">Chemical</option>
+														<option value="HEALTH_MEDICAL">Health & Medical</option>
+														<option value="ELECTRONIC">Electronics</option>
+														<option value="COSMETIC">Cosmetic</option>
+													</select>
+												</td>
+											</tr>
+											<tr>
+												<th class="form-group"><h6>Product Name<span>*</span></h6></th>
+												<td><input type="text" name="productName" value="" required></td>
+											</tr>
+	
+											<tr>
+												<!-- 원산지 -->
+												<th class="form-group"><h6>Origin<span>*</span></h6></th>
+												<td><input type="text" class="origin" id="origin" name="origin"
+														value="" required></td>
+											</tr>
+											<tr>
+												<!-- 가격 과 단위 처리 어떻게 할지 물어보기 -->
+												<!-- 가격 & 단위 -->
+												<th class="form-group"><h6>Price<span>*</span></h6></th>
+												<td>
+													<span>$<input type="number" step="0.001" class="price" id="price" name="price" value="" required></span>
+													<!-- <input type="text" class="unit" id="unit" name="unit" value=""> -->
+												</td>
+											</tr>
+											<!-- 최소 주문 수량 -->
+											<tr>
+												<th class="form-group"><h6>Quantity & Unit<span>*</span></h6></th>
+												<td>
+													<div class="moq-unit">
+														<input type="number" class="moq" id="moq" name="moq" value="" placeholder="amount" required>
+														<input type="text" class="unit" id="unit" name="unit" value="" placeholder="unit" required>
+													</div>
+													<p style="margin-left: 23px;">Minimum Order</p>
+												</td>   
+											</tr>
+											<!-- 단위 -->
+											<!-- <tr>
+												<th class="form-group"><h6>Unit<span>*</span></h6></th>
+												<td>
+													<input type="text" class="unit" id="unit" name="unit" value="" required>
+												</td>
+											</tr> -->
+											<tr>
+												<th class="form-group"><h6>Representative image<span>*</span></h6></th>
+												<td>
+													<input type="file" class="uploadImg" id="uploadImg" name="uploadImg" required>
+												</td>   
+											</tr>
+										<!-- / 무역 정보 작성 -->
+	
+										<!-- 상품 정보 작성 -->
+	
+											<tr>
+												<th colspan="2" class="form-group editor"><h6>Product Details<span>*</span></h6></th>
+											</tr>
+											<tr>
+												<td colspan="2">
+													<div name="editor" id="ckeditor"></div>
+													<input type="hidden" name="productDesc" id="productDesc">
+												</td>
+											</tr>
+										<!-- / 상품 정보 작성 -->
+										</div>
+										<!-- 회원ID -->
+										<input type="hidden" name="customerId" th:value="${#authentication.name}">
+										<input type="hidden" name="remoteIp" id="remoteIp">
+										<input type="hidden" name="country" id="country">
+									</table>
+	
+									<div class="col-12">
+										<div class=" form-group submit-btn">
+											<button class="btn" id="insertBtn" type="button">Submit</button>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div> <!--/ End Form -->
+					</div>
+				</div>
+			</div>
+		</section> <!--/ End Login -->
+
+	
+
+		<!-- Start Footer Area -->
+	<footer class="footer">
+		<!-- Footer Top -->
+		<div class="footer-top section">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>About Us</h4>
+							<ul>
+								<li><a href="#">Company Overview</a></li>
+								<li><a href="#">Agent Program</a></li>
+								<li><a href="#">Advertise with us</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Buying on EC21</h4>
+							<ul>
+								<li><a href="#">Post Buying Leads</a></li>
+								<li><a href="#">Browse Category</a></li>
+								<li><a href="#">Products by Keywords</a></li>
+								<li><a href="#">Products by Country</a></li>
+								<li><a href="#">Idea Products</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+
+					<!-- Single Widget -->
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Selling on EC21</h4>
+							<ul>
+								<li><a href="#">Post Products</a></li>
+								<li><a href="#">Manage Products</a></li>
+								<li><a href="#">Post Selling Leads</a></li>
+								<li><a href="#">Search Buying Leads</a></li>
+								<li><a href="#">Search Buyer Data</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Services</h4>
+							<ul>
+								<li><a href="#">Basic Services</a></li>
+								<li><a href="#">Trade PRO</a></li>
+								<li><a href="#">Trade OK</a></li>
+								<li><a href="#">Credit Reports</a></li>
+								<li><a href="#">TradeVerify</a></li>
+							</ul>
+						</div>
+					</div>
+					<!-- End Single Widget -->
+					<div class="col-lg-3 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer social">
+							<h4>Share this page</h4>
+							<ul>
+								<li><a href="#"><i class="ti-facebook"></i></a></li>
+								<li><a href="#"><i class="ti-twitter"></i></a></li>
+								<li><a href="#"><i class="ti-flickr"></i></a></li>
+								<li><a href="#"><i class="ti-instagram"></i></a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Footer Top -->
+		<div class="copyright">
+			<div class="container">
+				<div class="inner">
+					<div class="row">
+						<div class="col-lg-6 col-12">
+							<div class="left">
+								<p>Copyright © 1997-2024 <a href="#" target="_blank">EC21 Inc.</a> All Rights Reserved.
+									EC21 in Korean | Chinese Business Registry Number: 120-86-03931</p>
+							</div>
+						</div>
+						<div class="col-lg-6 col-12">
+							<div class="right">
+								<img th:src="@{/main/images/payments.png}" alt="#">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- /End Footer Area -->
+
+	<!-- Jquery -->
+	<script th:src="@{/main/js/jquery.min.js}"></script>
+	<script th:src="@{/main/js/jquery-migrate-3.0.0.js}"></script>
+	<script th:src="@{/main/js/jquery-ui.min.js}"></script>
+	<!-- Popper JS -->
+	<script th:src="@{/main/js/popper.min.js}"></script>
+	<!-- Bootstrap JS -->
+	<script th:src="@{/main/js/bootstrap.min.js}"></script>
+	<!-- Color JS -->
+	<script th:src="@{/main/js/colors.js}"></script>
+	<!-- Slicknav JS -->
+	<script th:src="@{/main/js/slicknav.min.js}"></script>
+	<!-- Owl Carousel JS -->
+	<script th:src="@{/main/js/owl-carousel.js}"></script>
+	<!-- Magnific Popup JS -->
+	<script th:src="@{/main/js/magnific-popup.js}"></script>
+	<!-- Fancybox JS -->
+	<script th:src="@{/main/js/facnybox.min.js}"></script>
+	<!-- Waypoints JS -->
+	<script th:src="@{/main/js/waypoints.min.js}"></script>
+	<!-- Countdown JS -->
+	<script th:src="@{/main/js/finalcountdown.min.js}"></script>
+	<!-- Nice Select JS -->
+	<script th:src="@{/main/js/nicesellect.js}"></script>
+	<!-- Ytplayer JS -->
+	<!-- <script th:src="@{/main/js/ytplayer.min.js}"></script> -->
+	<!-- Flex Slider JS -->
+	<script th:src="@{/main/js/flex-slider.js}"></script>
+	<!-- ScrollUp JS -->
+	<script th:src="@{/main/js/scrollup.js}"></script>
+	<!-- Onepage Nav JS -->
+	<script th:src="@{/main/js/onepage-nav.min.js}"></script>
+	<!-- Easing JS -->
+	<script th:src="@{/main/js/easing.js}"></script>
+	<!-- Active JS -->
+	<script th:src="@{/main/js/active.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-Ec21Application<ec21>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "net.kdigital.ec21.Ec21Application",
+            "projectName": "ec21",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

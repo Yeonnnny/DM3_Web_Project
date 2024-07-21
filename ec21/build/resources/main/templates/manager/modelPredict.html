@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" th:href="@{/production/images/ec21logo.png}">
+
+  <title>ec21 관리자 페이지</title>
+
+  <!-- Web Font -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link th:href="@{/vendors/bootstrap/dist/css/bootstrap.min.css}" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link th:href="@{/vendors/font-awesome/css/font-awesome.min.css}" rel="stylesheet">
+  <!-- NProgress -->
+  <link th:href="@{/vendors/nprogress/nprogress.css}" rel="stylesheet">
+  <!-- iCheck -->
+  <link th:href="@{/vendors/iCheck/skins/flat/green.css}" rel="stylesheet">
+
+  <!-- bootstrap-progressbar -->
+  <link th:href="@{/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css}" rel="stylesheet">
+  <!-- JQVMap -->
+  <link th:href="@{/vendors/jqvmap/dist/jqvmap.min.css}" rel="stylesheet" />
+  <!-- bootstrap-daterangepicker -->
+  <link th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}" rel="stylesheet">
+
+  <!-- Custom Theme Style -->
+  <link th:href="@{/build/css/custom.css}" rel="stylesheet">
+
+  <!-- 240414 dy : JQuery 파일 추가 및 ajax 추가 -->
+  <!-- 240415 dy : 카테고리와 검색어 기능 구현 -->
+  <script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+  
+<script>
+    function updateProgressBarColors() {
+      $('.progress-bar').each(function () {
+        var width = parseFloat($(this).attr('data-valuenow'));
+        if (width > 50 && width <= 60) {
+          $(this).addClass('progress-bar-warning');
+        } else if (width > 60 && width <= 70) {
+          $(this).addClass('progress-bar-orange');
+        } else if (width > 70 && width <= 80) {
+          $(this).addClass('progress-bar-red');
+        } else if (width > 80) {
+          $(this).addClass('progress-bar-danger');
+        }
+      });
+    }
+
+    // function updateBadgeColors() {
+    //   $('.badge').each(function () {
+    //     var percentage = parseFloat($(this).text());
+    //     // 기존의 모든 색상 클래스를 제거합니다.
+    //     $(this).removeClass('badge-secondary badge-warning badge-orange badge-danger');
+    //     // 새로운 색상 클래스를 조건에 따라 추가합니다.
+    //     if (percentage > 50 && percentage <= 75) {
+    //       $(this).addClass('badge-warning');
+    //     } else if (percentage > 75 && percentage <= 90) {
+    //       $(this).addClass('badge-orange');
+    //     } else if (percentage > 90) {
+    //       $(this).addClass('badge-danger');
+    //     } else {
+    //       $(this).addClass('badge-secondary');
+    //     }
+    //   });
+    // }
+
+    $(document).ready(function () {
+      // AJAX 호출 이후 또는 문서가 준비된 후에 progress-bar 요소에 대한 로직을 실행
+      init();
+      $("#category").on("change", search);
+      $("#searchWord").on("keyup", search);
+      $(".wordPlusBtn").on("click", wordPlus);
+
+      // 240418 iy: 모달 기능 구현 
+      // 모달 변수 초기화
+      var modal = $("#myModal");
+
+      // 닫기 버튼 이벤트
+      $("#closeBtn").on("click", function (event) {
+        modal.hide();
+      });
+
+      // 상품 설명 내의 텍스트에서 유사단어를 찾아 강조 스타일을 적용하는 함수
+      function applyHighlighting(similarWords, content) {
+        similarWords.forEach(word => {
+          const escapedWord = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+          const regex = new RegExp(escapedWord, 'gi');
+          content = content.replace(regex, '<span class="highlight">$&</span>');
+        });
+        return content;
+      }
+      // 이벤트 위임을 사용하여 동적 요소에 이벤트 연결
+      $(document).on("click", "a[class^='modalBtn']", function () {
+        let productId = $(this).data("id");
+        let modalName = $(this).data("name");
+        let modalDesc = $(this).data("desc");
+
+        // 모달 컨텐츠 업데이트
+        $("#modalName").html(modalName);
+        $("#modalDesc").html(modalDesc);
+
+        // 모달 열기
+        $("#myModal").modal();
+
+        $.ajax({
+          url: "/manager/modelPredict/getProhibitSimilarWordDTOs",
+          data: { "productId": productId },
+          method: "GET",
+          success: function (data) {
+            // 서버에서 받은 데이터 로깅
+            console.log("Received data:", data);
+            $("#modalTable").replaceWith(data); // 금지어 목록 업데이트
+
+            // 금지어 목록을 업데이트하고 로깅
+            $("#modalTable").replaceWith(data);
+            console.log("Updated prohibited words list.");
+
+            // 'similarWord' 데이터를 배열로 추출
+            var similarWords = $("#modalTable tbody tr").map(function () {
+              return $(this).find("td[id='similarWord']").text().trim();
+            }).get();
+            console.log("Similar words:", similarWords);
+
+            // 상품명에서 유사단어 강조 적용
+            var modalName = $("#modalName").text();
+            modalName = applyHighlighting(similarWords, modalName);
+            $("#modalName").html(modalName);
+
+
+            // 상품 설명에서 유사단어 강조 적용
+            var modalDesc = $("#modalDesc").text();
+            modalDesc = applyHighlighting(similarWords, modalDesc);
+            $("#modalDesc").html(modalDesc);
+
+            // 이벤트 리스너 다시 바인딩
+            $(".wordPlusBtn").off("click").on("click", wordPlus);
+          }
+          ,
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log('AJAX call failed: ', textStatus, errorThrown);
+          }
+        });
+        // 240418 iy: 모달 기능 구현 끝
+
+
+
+
+
+      });
+
+      // toast 구현 시작
+
+      const toastTrigger = document.getElementById('liveToastBtn');
+      const toastLiveExample = document.getElementById('liveToast');
+
+      if (toastTrigger) {
+        toastTrigger.addEventListener('click', () => {
+          const toast = new bootstrap.Toast(toastLiveExample, {
+            delay: 30000  // 10초 동안 보여줌
+          })
+
+          toast.show();
+        });
+      }
+
+      // Check 버튼에 페이지 새로고침 이벤트 추가
+      document.getElementById('refreshPage').addEventListener('click', function () {
+        window.location.reload();  // 현재 페이지를 새로고침
+      });
+
+      // 닫기버튼 이벤트 추가
+
+      $('#toastClose').click(function () {
+        $('.toast').toast('hide'); // Toast 숨기기
+      });
+
+      // toast 구현 끝
+    });
+
+
+    // $('.toast').toast({
+    //   delay: 2000 // 2초 동안 보여준 후 사라짐
+    // });
+
+    // 정상 버튼 클릭 시 judge Y로 변경
+    function productNormal() {
+      let productId = $(this).attr("data-id");
+      if (confirm("정상 상품으로 처리하시겠습니까?")) {
+        $.ajax({
+          url: "/modelPredict/productNormal",
+          data: { "productId": productId },
+          method: "GET",
+          success: function (resp) {
+            // resp의 타입 : Boolean
+            if (resp) {
+              alert("정상 상품으로 등록되었습니다.");
+              // 페이지 새로고침
+              // window.location.reload();
+              search();
+            }
+          }
+        });
+      }
+    }
+
+
+    // 이상 버튼 클릭 시 judge N으로 변경
+    function productWeird() {
+      let productId = $(this).attr("data-id");
+      if (confirm("이상 상품으로 처리하시겠습니까? ")) {
+        $.ajax({
+          url: "/modelPredict/productWeird",
+          data: { "productId": productId },
+          method: "GET",
+          success: function (resp) {
+            // resp의 타입 : Boolean
+            if (resp) {
+              alert("이상 상품으로 등록되었습니다.");
+              // 페이지 새로고침
+              //window.location.reload();
+              search();
+            }
+          }
+        });
+      }
+    }
+
+
+    // 단어 추가 버튼 클릭 시 DB에 추가하고 버튼 비활성화
+    function wordPlus() {
+      let similarWord = $(this).data("word");
+      let prohibitReason = $(this).data("reason");
+      // 처리 전 확인 
+      if (confirm(similarWord + " (" + prohibitReason + ")" + "를 금지어 리스트에 추가하시겠습니까? ")) {
+        $.ajax({
+          url: "/modelPredict/wordPlus",
+          data: { "similarWord": similarWord, "prohibitReason": prohibitReason },
+          method: "GET",
+          success: function (resp) {
+            console.log(resp);
+            // resp : Boolean 타입 넘어옴
+            if (resp) {
+              // true인 경우 DB에 저장됨
+              alert("금지어리스트에 추가되었습니다.")
+            } else {
+              // false인 경우 이미 존재하다고 알려야 함
+              alert("이미 금지어 리스트에 존재하는 단어입니다.");
+            }
+          }
+        });
+      }
+    }
+
+    function removeImageTags() {
+      // 모든 .project_progress 내의 <img> 태그를 제거
+      $('.project_progress').each(function () {
+        var content = $(this).html();
+        content = content.replace(/<img[^>]*>/g, ""); // 이미지 태그를 제거
+        $(this).html(content);
+      });
+    }
+
+    function search() {
+      let category = $("#category").val();
+      let searchWord = $("#searchWord").val();
+
+      $.ajax({
+        url: "/manager/modelPredict/getList",
+        data: { "category": category, "searchWord": searchWord },
+        method: "GET",
+        success: function (list) {
+          $("#result").replaceWith(list);
+          $(".toNormal").on("click", productNormal);
+          $(".toWeird").on("click", productWeird);
+          updateProgressBarColors();
+          // updateBadgeColors();
+          removeImageTags();
+        }
+      })
+
+    }
+
+
+    function init() {
+      $.ajax({
+        url: "/manager/modelPredict/getList",
+        data: { "category": "total", "searchWord": "" },
+        method: "GET",
+        success: function (list) {
+          $("#result").replaceWith(list);
+          $(".toNormal").on("click", productNormal);
+          $(".toWeird").on("click", productWeird);
+          updateProgressBarColors();
+          // updateBadgeColors();
+          removeImageTags();
+        }
+      });
+    }
+
+
+
+
+  </script>
+
+  
+</head>
+
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+          <div class="navbar nav_title">
+            <a th:href="@{/manager/manager_index}" class="site_title">
+              <img th:src="@{/production/images/ec21logo.png}" alt="">
+            </a>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <!-- menu profile quick info -->
+          <div class="profile clearfix">
+            <div class="profile_pic">
+              <img th:src="@{/production/images/user.jpeg}" alt="..." class="img-circle profile_img">
+            </div>
+            <div class="profile_info">
+              <h2>이길아 님</h2>
+            </div>
+          </div>
+          <!-- /menu profile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+              <ul class="nav side-menu">
+                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/manager_index}">Dashboard</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-edit"></i> 상품관리 <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/productList}">전체 상품 조회</a></li>
+                    <li><a th:href="@{/manager/modelPredict}">모델 결과 조회</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-users"></i> 회원관리 <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/customerList}">전체 회원 조회</a></li>
+                    <li><a th:href="@{/manager/reportedCustomerList}">신고 회원 조회</a></li>
+                    <li><a th:href="@{/manager/blackList}">블랙 회원 조회</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      <div class="top_nav">
+        <div class="nav_menu">
+          <div class="nav toggle">
+            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+          </div>
+          <nav class="nav navbar-nav">
+            <ul class=" navbar-right">
+              <li class="nav-item dropdown open" style="padding-left: 15px;">
+                <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown"
+                  data-toggle="dropdown" aria-expanded="false">
+                  <img th:src="@{/production/images/user.jpeg}" alt="...">관리자
+                </a>
+                <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" th:href=@{/}><i class="fa fa-home pull-right"></i> Home</a>
+                  <a class="dropdown-item" th:href="@{/main/logout}"><i class="fa fa-sign-out pull-right"></i> Log
+                    Out</a>
+                </div>
+              </li>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <div class="">
+          <!-- <div class="page-title">
+            <div class="title_left">
+              <h3>Products <small>상품관리</small></h3>
+            </div>
+
+          </div> -->
+
+          <div class="clearfix"></div>
+
+          <div class="row">
+            <div class="col-md-12  col-sm-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h3>모델 결과 조회</h3>
+                  <div class="clearfix"></div>
+                </div>
+
+
+                <div class="title_right">
+                  <div class="col-md-5 col-sm-5 form-group pull-right top_search">
+                    <div class="input-group">
+                      <select name="category" id="category">
+                        <option value="total">전체</option>
+                        <option value="FOOD_BEVERAGE">FOOD_BEVERAGE</option>
+                        <option value="CHEMICAL">CHEMICAL</option>
+                        <option value="HEALTH_MEDICAL">HEALTH_MEDICAL</option>
+                        <option value="ELECTRONIC">ELECTRONIC</option>
+                        <option value="COSMETIC">COSMETIC</option>
+                      </select>
+                      <input type="text" class="form-control" id="searchWord" placeholder="Search for...">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">찾기</button>
+                      </span>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="x_content">
+
+
+                  <!-- start project list -->
+                  <table id="" class="tables table-striped jambo_table table-bordered " cellspacing="0" width="100%">
+                    <!-- dt-responsive-->
+                    <!-- <table id="datatable" class="table table-striped jambo_table table-bordered dataTable no-footer"> -->
+                    <thead>
+                      <!-- <button id="modalBtn">모달 열기</button> -->
+                      <tr class="headings">
+                        <th class="column-title">no</th>
+                        <th class="column-title">회원 ID</th>
+                        <th class="column-title">상품 ID</th>
+                        <!-- <th style="width: 10%">카테고리</th> -->
+                        <!-- <th class="column-title" style="width: 20%">상품명</th> -->
+                        <!-- <th class="column-title" style="width: 20%">상품설명</th> -->
+                        <th class="column-title">상품내용</th>
+                        <th class="column-title">판별결과</th>
+                        <!-- <th class="column-title" style="width: 20%;">예측값</th> -->
+                        <th class="column-title">금지어</th>
+                        <th class="column-title toastTable">
+                          <button type="button" class="" id="liveToastBtn"></button>
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <!-- 240414 dy : ajax로 모델이상상품 정보 꽂아 넣기 -->
+                    <tbody id="result">
+                      <tr class="view" th:each="product, i:${list}">
+                        <input type="hidden" id="modelProduct" th:value="${product}">
+                        <td class="no" th:text="${i.index + 1}"></td>
+                        <td th:text="${product.customerId}">abc</td>
+                        <td th:text="${product.productId}">121000203</td>
+                        <!-- <td th:text="${product.category}">카테고리</td> -->
+                        <!-- <td> -->
+                        <!-- <a href="#myModal" id="modalBtn" th:text="${product.productName}">ipone</a> -->
+                        <!-- <a href="#" th:id="'modalBtn' + ${product.productId}" th:text="${product.productName}"
+                            th:data-name="${product.productName}" th:data-desc="${product.productDesc}"
+                            th:data-id="${product.productId}">iphone</a> -->
+                        <!-- </td> -->
+                        <!-- 나중에 th:utext로 바꿔야 함 -->
+                        <!-- <td class="project_progress" th:utext="${product.productDesc}"> -->
+                        <!-- 아이폰 11 판매 -->
+                        <!-- </td> -->
+
+                        <td id="product">
+                          <div>
+                            <a href="#" id="productName" th:class="'modalBtn' + ${product.productId}"
+                              th:text="${product.productName}" th:data-name="${product.productName}"
+                              th:data-desc="${product.productDesc}" th:data-id="${product.productId}">iphone</a>
+                          </div>
+                          <div href="#" id="productDesc" class="project_progress" th:utext="${product.productDesc}">
+                            iphone</div>
+                          <div class="modelPredict">
+                            <!-- [[${#numbers.formatDecimal(product.lstmPredictProba * 100, 1, 2)} + ' %']] -->
+
+                          </div>
+                        </td>
+
+                        <td>
+                          <div class="progress-top">
+                            <div class="progress">
+                              <div class="progress-bar" role="progressbar"
+                                th:style="'width:' + ${#numbers.formatDecimal(product.lstmPredictProba * 100, 1, 2)} + '%;'"
+                                th:data-valuenow="${#numbers.formatDecimal(product.lstmPredictProba * 100, 1, 2)}"
+                                aria-valuemin="0" aria-valuemax="100"> <!--style="width:30px"-->
+                                [[${#numbers.formatDecimal(product.lstmPredictProba * 100, 1, 2)} + ' %']]
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <!--
+                                                        <div th:text="${numbers.formatDecimal(product.lstmPredictProba * 100, 1, 2)} + '%'">
+                                                        </div> -->
+                        <!-- 이상검출도: [[${product.lstmPredictProba}]] % -->
+
+
+                        <!-- <div class="progress progress_sm">
+                            <div class="progress-bar bg-green" role="progressbar"
+                              th:attr="style=|width: ${#numbers.formatDecimal(product.lstmPredictProba * 100, 1, 2)}%|">
+                            </div>
+                          </div> -->
+
+                        <!-- 이상단어유사도: [[${product.similarProba}]] %
+                          <div class="progress progress_sm">
+                            <div class="progress-bar bg-green" role="progressbar"
+                              th:attr="style=|width: ${product.similarProba}%|">
+                            </div>
+                          </div> -->
+                        <td>
+                          <div class="prohibitWord">
+                            <div class="prohibit" th:if="${product.prohibitWord != null}">
+                              <div th:if="${product.similarProba > 90 ? 'badge-danger' : 
+                                product.similarProba > 75 ? 'badge-orange' : 
+                                product.similarProba > 50 ? 'badge-warning' : 'badge-secondary'}">
+                                [[${product.prohibitWord}]] ([[${product.prohibitReason}]])
+                                <!-- <span class="badge badge-secondary">[[${product.similarProba}]] %</span> -->
+                              </div>
+                            </div>
+                            <div th:unless="${product.prohibitWord != null}">
+                              미검출
+                            </div>
+                          </div>
+                          <!-- <div class="progress progress_sm">
+                            <div class="progress-bar bg-green" role="progressbar"
+                              th:attr="style=|width: ${#numbers.formatDecimal(product.lstmPredictProba * 100, 1, 2)}%|">
+                            </div>
+                          </div> -->
+
+                          <!-- 이상단어유사도: [[${product.similarProba}]] %
+                          <div class="progress progress_sm">
+                            <div class="progress-bar bg-green" role="progressbar"
+                              th:attr="style=|width: ${product.similarProba}%|">
+                            </div>
+                          </div> -->
+                        </td>
+
+                        <td>
+                          <a href="#" class="btn btn-info btn-xs toNormal" th:data-id="${product.productId}"> 정상 </a>
+                          <!--정상 클릭시 judge 1로 변경-->
+                          <a href="#" class="btn btn-danger btn-xs toWeird" th:data-id="${product.productId}"> 이상 </a>
+                          <!--이상 클릭시 judge 0로 변경-->
+                        </td>
+
+                      </tr>
+                    </tbody>
+                  </table>
+                  <!-- end project list -->
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /page content -->
+
+    </div>
+  </div>
+
+
+  <!-- 모달창 -->
+  <!-- 모달 컨테이너 -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <!-- 모달창의 헤더부분의 시작 -->
+        <div class="modal-header">
+          <h4 class="modal-title">상세 페이지</h4>
+        </div>
+        <!-- 모달창의 헤더부분의 끝 -->
+        <!-- 모달창의 바디부분의 시작 바디부분이 모달창에서 표시하고자하는 컨텐츠를 입력한다.-->
+
+
+        <div class="modal-body">
+
+          <div class="car-header">상품명</div>
+          <p id="modalName">Laptop for Gamming</p>
+          <div class="car-header">상품설명</div>
+          <p id="modalDesc">Apple mackbook pro 7th generation in sealed pack box and warranty with free delivery to
+            your home
+            address.
+            product comes with complete pack box</p>
+
+
+          <div class="card-body">
+
+            <!-- 240419 dy : 모달html에 ajax와 thymeleaf 잘 섞어서 사용.. -->
+            <table class="table table-striped jambo_table bulk_action" id="modalTable">
+              <thead>
+                <tr>
+                  <th>유사단어</th>
+                  <th>금지어리스트 단어 (카테고리)</th>
+                  <th>유사도</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="item : ${list}" th:if="${list != null and not #lists.isEmpty(list)}">
+                  <td id="similarWord">[[${item.similarWord}]]</td>
+                  <td>[[${item.prohibitWord}]] ([[${item.prohibitReason}]])</td>
+                  <td>[[${item.similarProba}]]%</td>
+                  <td><input type="button" value="금지어 사전 추가" class="btn btn-info btn-xs similarWordBtn" th:data-word="${item.similarWord}"
+                      th:data-reason="${item.prohibitReason}"> </td>
+                </tr>
+                <tr th:unless="${list != null and not #lists.isEmpty(list)}">
+                  <td colspan="4">결과가 존재하지 않습니다.</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+        </div>
+        <!-- 모달창의 바디부분의 끝 -->
+        <!-- 모달창의 푸터부분의 시작 -->
+        <!-- 푸터부에는 닫기부분이 위치하게 된다.  -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-xs" id="closeBtn" data-dismiss="modal">닫기</button>
+        </div>
+        <!-- 모달창의 푸터부분의 끝 -->
+      </div>
+    </div>
+  </div>
+  <!-- 모달 끝 -->
+
+  <!-- toast start-->
+  <div class="toast-container position-fixed top-0 start-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="fa-solid fa-bell"></i>
+        <strong class="me-auto">EC21</strong>
+        <small>1 sec ago</small>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button> -->
+      </div>
+      <div class="toast-body">
+        <div class="toast-desc">
+          이상으로 판별된 상품이 추가되었습니다. <br>
+          확인하시겠습니까?
+        </div>
+        <div class="mt-2 pt-2 border-top">
+          <button type="button" class="btn btn-primary btn-sm" id="refreshPage">Check</button>
+          <button type="button" id="toastClose" class="btn btn-secondary btn-sm">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- toast end-->
+
+
+
+  <!--fontawesome-->
+  <script src="https://kit.fontawesome.com/6b7fc4123a.js" crossorigin="anonymous"></script
+  <!-- jQuery -->
+  <script th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+  <!-- Bootstrap -->
+  <script th:src="@{/vendors/bootstrap/dist/js/bootstrap.bundle.js}"></script>
+  <!-- FastClick -->
+  <script th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+  <!-- NProgress -->
+  <script th:src="@{/vendors/nprogress/nprogress.js}"></script>
+  <!-- bootstrap-progressbar -->
+  <script th:src="@{/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
+
+  <!-- Custom Theme Scripts -->
+  <script th:src="@{/build/js/custom.min.js}"></script>
+
+  <!-- Datatables -->
+  <script th:src="@{/vendors/datatables.net/js/jquery.dataTables.js}"></script>
+  <script th:src="@{/vendors/datatables.net-bs/js/dataTables.bootstrap.js}"></script>
+  <script th:src="@{/vendors/datatables.net-buttons/js/dataTables.buttons.js}"></script>
+  <script th:src="@{/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.js}"></script>
+  <script th:src="@{/vendors/datatables.net-buttons/js/buttons.flash.js}"></script>
+  <script th:src="@{/vendors/datatables.net-buttons/js/buttons.html5.js}"></script>
+  <script th:src="@{/vendors/datatables.net-buttons/js/buttons.print.js}"></script>
+  <script th:src="@{/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.js}"></script>
+  <script th:src="@{/vendors/datatables.net-keytable/js/dataTables.keyTable.js}"></script>
+  <script th:src="@{/vendors/datatables.net-responsive/js/dataTables.responsive.js}"></script>
+  <script th:src="@{/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js}"></script>
+  <script th:src="@{/vendors/datatables.net-scroller/js/dataTables.scroller.js}"></script>
+  <script th:src="@{/vendors/jszip/dist/jszip.js}"></script>
+  <script th:src="@{/vendors/pdfmake/build/pdfmake.js}"></script>
+  <script th:src="@{/vendors/pdfmake/build/vfs_fonts.js}"></script>
+</body>
+
+</html>

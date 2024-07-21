@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- Meta Tag -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name='copyright' content=''>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Title Tag  -->
+	<title>EC21, Global B2B Marketplace</title>
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" th:href="@{/main/images/ec21logo.png}">
+	<!-- Web Font -->
+	<link
+		href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+		rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+	<!-- StyleSheet -->
+	<!-- Bootstrap -->
+	<link rel="stylesheet" th:href="@{/main/css/bootstrap.css}">
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" th:href="@{/main/css/magnific-popup.min.css}">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" th:href="@{/main/css/font-awesome.css}">
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"> -->
+	<!-- <link th:href="@{../vendors/font-awesome/css/font-awesome.min.css}" rel="stylesheet"> -->
+	<!-- Fancybox -->
+	<link rel="stylesheet" th:href="@{/main/css/fancybox.min.css}">
+	<!-- Themify Icons -->
+	<link rel="stylesheet" th:href="@{/main/css/themify-icons.css}">
+	<!-- Nice Select CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/niceselect.css}">
+	<!-- Animate CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/animate.css}">
+	<!-- Flex Slider CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/flex-slider.min.css}">
+	<!-- Owl Carousel -->
+	<link rel="stylesheet" th:href="@{/main/css/owl-carousel.css}">
+	<!-- Slicknav -->
+	<link rel="stylesheet" th:href="@{/main/css/slicknav.min.css}">
+
+	<!-- Eshop StyleSheet -->
+	<link rel="stylesheet" th:href="@{/main/css/reset.css}">
+	<link rel="stylesheet" th:href="@{/main/css/style.css}">
+	<link rel="stylesheet" th:href="@{/main/css/responsive.css}">
+	<link rel="stylesheet" th:href="@{/main/css/inbox.css}">
+
+	<!-- Color CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/color/color2.css}">
+	<link rel="stylesheet" href="" id="colors">
+
+	<!-- modal -->
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+	<!-- 240422 dy : ajax.. -->
+	<script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+	<script>
+		$(function () {
+
+			// saved 처리
+			$(document).on('click', '.saved-icon', function (event) {
+				event.preventDefault();
+				var icon = $(this).find('i');
+				var inquiryId = $(icon).attr("data-id");
+				var how = "";
+
+				if (icon.hasClass('ti-star')) {
+					icon.removeClass('ti-star').addClass('fa fa-star');
+					how = "savedYes";
+				} else {
+					icon.removeClass('fa fa-star').addClass('ti-star');
+					how = "savedNo";
+				}
+
+				$.ajax({
+					url: "/inbox/sender/updateSaved",
+					data: { "inquiryId": inquiryId, "how": how },
+					method: "GET"
+				});
+			});
+
+			// 모달 변수 초기화
+			var modal = $("#inquiryDetail");
+			// 닫기 버튼 이벤트
+			$("#closeBtn").on("click", function (event) {
+				modal.hide();
+			});
+			// 모달 백그라운드 클릭 이벤트
+			$(window).on("click", function (event) {
+				if ($(event.target).is(modal)) {
+					modal.hide();
+				}
+			});
+
+			// 모달창 값 채우기 & 모달창 열기
+			$(document).on("click", "a[id^='modalBtn']", function () {
+				let inquiryId = $(this).attr("data-id");
+				let customerId = $(this).attr("data-user");
+				$.ajax({
+					url: "/inbox/getInquiryModalDTO",
+					data: { "inquiryId": inquiryId, "customerId":customerId},
+					method: "GET",
+					success: function (dto) {
+						// 모달 값 채우기
+						$("#modalFile").attr("data-inquiryId", dto.inquiryId);
+						$("#modalInquiryTitle").text(dto.inquiryTitle);
+						$("#modalReceiverId").text(dto.receiverId);
+						$("#modalSenderId").text(dto.senderId);
+						$("#modalProductName").text(dto.productName);
+						$("#modalCategory").text(dto.category);
+						$("#modalQuantity").text(dto.quantity);
+						$("#modalUnit").text(dto.unit);
+						$("#modalInquiryContent").text(dto.inquiryContent);
+						$("#modalFile").text(dto.originalFileName);
+						// 모달열기
+						$("#inquiryDetail").modal();
+					}
+				}); // End ajax
+			}); // End 모달 클릭 이벤트
+
+		});
+
+		// 첨부 파일 다운로드
+		function download() {
+			let inquiryId = $("#modalFile").attr("data-inquiryID");
+			window.location = '/inbox/downloadFile?inquiryId=' + encodeURIComponent(inquiryId);
+		}
+
+
+		// 쓰레기통으로 처리하는 함수
+		function toTrash(element) {
+			let inquiryId = element.getAttribute("data-id");
+			if (confirm("Would you like to move this to the trash?")) {
+				$.ajax({
+					url: "/inbox/sender/toTrash",
+					data: { "inquiryId": inquiryId },
+					method: "GET",
+					success: function (resp) {
+						if (resp) {
+							if (resp) {
+								alert("Processing completed.");
+								// 페이지 새로 고침
+								window.location.reload();
+							}
+						}
+					}
+				});
+			}
+		}
+
+
+	</script>
+</head>
+
+<body class="js">
+
+	<!-- Preloader -->
+	<!-- <div class="preloader">
+		<div class="preloader-inner">
+			<div class="preloader-icon">
+				<span></span>
+				<span></span>
+			</div>
+		</div>
+	</div> -->
+	<!-- End Preloader -->
+
+	<!-- Header -->
+	<header class="header shop">
+		<!-- Topbar -->
+		<div class="topbar">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-4 col-md-12 col-12">
+						<!-- Top Left -->
+						<div class="top-left">
+							<!-- logo -->
+							<div class="logo">
+								<a th:href="@{/}">
+									<img th:src="@{/main/images/ec21logo.png}" alt="logo"
+									style="left: 44%;">
+								</a>
+							</div>
+						</div>
+						<!--/ End Top Left -->
+					</div>
+					<div class="col-lg-8 col-md-12 col-12">
+						<!-- Top Right -->
+						<div class="right-content">
+							<ul class="list-main">
+								<li sec:authorize="isAnonymous()"><i class="ti-power-off"></i><a th:href="@{/main/login}">Login</a></li>
+								<li sec:authorize="isAnonymous()"><i class="ti-user"></i><a th:href="@{/main/register}">Sign up</a></li>
+								<li sec:authorize="isAuthenticated()"><i class="ti-power-off"></i><a th:href="@{/main/logout}">Logout</a></li>
+								<li sec:authorize="isAuthenticated()"><a th:href="@{/main/myproducts(customerId=${#authentication.name})}"><i class="fa fa-user-circle-o"
+											aria-hidden="true"></i><span sec:authorize="isAuthenticated()">[[${#authentication.name}]]</span></a></li>
+							</ul>
+						</div>
+						<!-- End Top Right -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Header Inner -->
+		<div class="header-inner">
+			<div class="container">
+				<div class="cat-nav-head">
+					<div class="row">
+					</div>
+					<div class="col-lg-9 col-12">
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--/ End Header Inner -->
+	</header>
+	<!--/ End Header -->
+
+
+	<!-- 인콰이어리 목록 -->
+	<section class="inquiry-area">
+		<div class="main-container">
+			<aside class="shop-sidebar">
+				<!-- Single Widget 인콰이어리 카테고리 -->
+				<div class="single-widget inquiry-category">
+					<h3 Inquiry class="inquiry-title">My Inquiry</h3>
+					<ul class="categor-list">
+						<li><a th:href="@{/main/inbox(customerId=${customerId})}">Received</a></li>
+						<li><a th:href="@{/main/inboxSent(customerId=${customerId})}" style="
+								color: #439eff;">Sent <span>[[${#lists.size(inquiryList)}]]</span></a></li>
+						<li><a th:href="@{/main/inboxSaved(customerId=${customerId})}">Saved</a></li>
+						<li><a th:href="@{/main/inboxSpam(customerId=${customerId})}">Spam</a></li>
+						<li><a th:href="@{/main/inboxBlock(customerId=${customerId})}">Block</a></li>
+						<li><a th:href="@{/main/inboxTrash(customerId=${customerId})}">Trash</a></li>
+					</ul>
+				</div>
+				<!--/ End Single Widget -->
+			</aside>
+
+			<!-- My inquiry List -->
+			<div class="shopping-cart section">
+				<div>
+					<table class="table shopping-summery inquiry">
+						<thead>
+							<tr class="main-hading">
+								<th class="saved-icon"></th>
+								<th class="receiverId">Receiver</th>
+								<th class="inquiryTitle" colspan="2">TITLE</th>
+								<th class="sendData">DATE</th>
+								<th class="trash"><i class="ti-trash remove-icon"></i></th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- 240422 dy : 보낸 인콰이어리 목록 출력 -->
+							<tr th:if="${inquiryList != null and !#lists.isEmpty(inquiryList)}"
+								th:each="inquiry : ${inquiryList}">
+								<!-- 저장 여부 : 클릭하면 색상 변하게 해둠-->
+								<td class="saved-icon"><a href="#" id="saved-icon"><i th:data-id="${inquiry.inquiryId}"
+											th:class="${inquiry.saved.name() == 'YN' or inquiry.saved.name() == 'YY'  ? 'fa fa-star' : 'ti-star'}"></i></a>
+								</td>
+								<!-- 담당자명-> receiverId -->
+								<td class="receiverId" data-title="receiverId"><span
+										class="receiverId">[[${inquiry.receiverId}]]</span></td>
+								<!-- 인콰이어리 제목 -->
+								<td data-title="inquiryTitle" colspan="2">
+									<span>
+										<!-- <a id="inquiryTitle" data-toggle="modal" data-target="#inquiryDetail" th:data-id="${inquiry.inquiryId}">[[${inquiry.inquiryTitle}]]</a> -->
+										<a class="inquiryTitle" th:id="'modalBtn'+${inquiry.inquiryId}" th:data-user="${#authentication.name}"
+											th:data-id="${inquiry.inquiryId}">[[${inquiry.inquiryTitle}]]</a>
+									</span>
+								</td>
+								<!-- 보낸 날짜 -->
+								<td class="sendDate" data-title="sendDate"><span>[[${#temporals.format(inquiry.sendDate, 'yyyy-MM-dd')}]]</span></td>
+								
+								<!-- 누르면 삭제 되면서 쓰통으로 -->
+								<!-- <td class="action" data-title="delete"><a href="#" class="trashBtn" th:data-id="${inquiry.inquiryId}"><i class="ti-trash remove-icon"></i></a></td> -->
+								<td data-title="trash"><a href="javascript:void(0)" class="trashBtn"
+										th:data-id="${inquiry.inquiryId}" onclick="toTrash(this)"><i
+											class="ti-trash remove-icon"></i></a></td>
+							</tr>
+						</tbody>
+					</table>
+					<!--/ End inquiry List -->
+				</div>
+			</div>
+			<!--/ End Shopping Cart -->
+		</div>
+	</section>
+
+	<!-- Start Footer Area -->
+	<footer class="footer">	
+		<div class="copyright" style="margin-left: 69px;">
+			<div class="container">
+				<div class="inner">
+					<div class="row">
+						<div class="col-lg-6 col-12">
+							<div class="left">
+								<p>Copyright © 1997-2024 <a href="https://www.ec21.com/" target="_blank">EC21 Inc.</a>
+									All Rights Reserved. EC21 in Korean | Chinese Business Registry Number: 120-86-03931
+								</p>
+							</div>
+						</div>
+						<div class="col-lg-6 col-12">
+							<div class="right">
+								<img th:src="@{/main/images/payments.png}" alt="#">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- /End Footer Area -->
+
+	<!-- Inquiry Modal -->
+	<div class="modal fade" id="inquiryDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<form class="form" action="#" method="post">
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<h4 class="modal-title" id="modalInquiryTitle">인콰이어리 제목</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<!-- Modal Body -->
+					<div class="modal-body">
+						<table>
+							<tr>
+								<th class="col-md-2">To</th>
+								<td id="modalReceiverId">zettlernb (Ningbo Zettler Electronics Co., Ltd.)</td>
+							</tr>
+							<tr>
+								<th class="">From</th>
+								<td id="modalSenderId"></td>
+							</tr>
+							<tr>
+								<th class="">Subject</th>
+								<td>
+									<span id="modalCategory">..</span> /
+									<span id="modalProductName">..</span>
+								</td>
+							</tr>
+							<!-- <tr>
+								<th class="">Category</th>
+								<td><span id="modalCategory">..</span></td>
+							</tr> -->
+							<tr>
+								<th class="">Quantity</th>
+								<td><span id="modalQuantity"></span> (<span id="modalUnit"></span>) </td>
+							</tr>
+							<tr>
+								<!-- 파일 부분 다운만 가능한 건 어떻게 하는지 까먹어서 우선 패스 -->
+								<th class="">Attach File</th>
+								<td>
+									<span>
+										<a href="javascript:download();" data-inquiryId="" id="modalFile">bts.jpg</a>
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<th colspan="2">Message</th>
+								<!-- <td><span><textarea id="modalInquiryContent" readonly></textarea></span></td> -->
+							</tr>
+							<tr>
+								<td class="message" colspan="2"><span id="modalInquiryContent"></span></td>
+							</tr>
+						</table>
+					</div>
+					<!-- Modal Footer -->
+					<div class="modal-footer">
+						<button type="button" id="closeBtn" class="btn" data-dismiss="modal">Close</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	</div>
+	<!--/ End Product Style 1  -->
+
+
+	<!-- Jquery -->
+	<script th:src="@{/main/js/jquery.min.js}"></script>
+	<script th:src="@{/main/js/jquery-migrate-3.0.0.js}"></script>
+	<script th:src="@{/main/js/jquery-ui.min.js}"></script>
+	<!-- Popper JS -->
+	<script th:src="@{/main/js/popper.min.js}"></script>
+	<!-- Bootstrap JS -->
+	<script th:src="@{/main/js/bootstrap.min.js}"></script>
+	<!-- Color JS -->
+	<script th:src="@{/main/js/colors.js}"></script>
+	<!-- Slicknav JS -->
+	<script th:src="@{/main/js/slicknav.min.js}"></script>
+	<!-- Owl Carousel JS -->
+	<script th:src="@{/main/js/owl-carousel.js}"></script>
+	<!-- Magnific Popup JS -->
+	<script th:src="@{/main/js/magnific-popup.js}"></script>
+	<!-- Fancybox JS -->
+	<script th:src="@{/main/js/facnybox.min.js}"></script>
+	<!-- Waypoints JS -->
+	<script th:src="@{/main/js/waypoints.min.js}"></script>
+	<!-- Countdown JS -->
+	<script th:src="@{/main/js/finalcountdown.min.js}"></script>
+	<!-- Nice Select JS -->
+	<script th:src="@{/main/js/nicesellect.js}"></script>
+	<!-- Ytplayer JS -->
+	<!-- <script th:src="@{/main/js/ytplayer.min.js}"></script> -->
+	<!-- Flex Slider JS -->
+	<script th:src="@{/main/js/flex-slider.js}"></script>
+	<!-- ScrollUp JS -->
+	<script th:src="@{/main/js/scrollup.js}"></script>
+	<!-- Onepage Nav JS -->
+	<script th:src="@{/main/js/onepage-nav.min.js}"></script>
+	<!-- Easing JS -->
+	<script th:src="@{/main/js/easing.js}"></script>
+	<!-- Active JS -->
+	<script th:src="@{/main/js/active.js}"></script>
+	<!-- myFunction JS : 필요한 자바 스크립트 이리로 넣어서 사용하면 됩니다 -->
+	<script th:src="@{/main/js/myFunction.js}"></script>
+
+</body>
+
+</html>

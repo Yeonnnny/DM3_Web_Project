@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" th:href="@{/production/images/ec21logo.png}">
+
+  <title>ec21 관리자 페이지</title>
+
+  <!-- Web Font -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link th:href="@{/vendors/bootstrap/dist/css/bootstrap.min.css}" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link th:href="@{/vendors/font-awesome/css/font-awesome.min.css}" rel="stylesheet">
+  <!-- NProgress -->
+  <link th:href="@{/vendors/nprogress/nprogress.css}" rel="stylesheet">
+  <!-- iCheck -->
+  <link th:href="@{/vendors/iCheck/skins/flat/green.css}" rel="stylesheet">
+
+  <!-- bootstrap-progressbar -->
+  <link th:href="@{/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css}" rel="stylesheet">
+  <!-- JQVMap -->
+  <link th:href="@{/vendors/jqvmap/dist/jqvmap.min.css}" rel="stylesheet" />
+  <!-- bootstrap-daterangepicker -->
+  <link th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}" rel="stylesheet">
+
+  <!-- Custom Theme Style -->
+  <link th:href="@{/build/css/custom.css}" rel="stylesheet">
+
+  <!-- 240414 dy : JQuery 파일 추가 및 ajax 추가 -->
+  <script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+
+  <!-- 240417 dy : 카테고리, 검색어에 따른 list 가져오기 및 정상버튼 활성화-->
+  <script>
+    $(function () {
+      $("#category").on("change", search);
+      $("#searchWord").on("keyup", search);
+      init();
+    })
+
+    function toNormal() {
+      let category = $("#category").val();
+      let searchWord = $("#searchWord").val();
+      let blacklistId = $(".blacklistId").val();
+      if (confirm("정상 회원으로 처리하시겠습니까?")) {
+        $.ajax({
+          url: "/manager/blackList/getList",
+          data: { "blacklistId": blacklistId, "category": category, "searchWord": searchWord },
+          method: "GET",
+          success: function (list) {
+            alert("정상 회원으로 처리되었습니다.");
+            $("#result").replaceWith(list);
+            $(".normalBtn").on("click", toNormal);
+          }
+        });
+      }
+    }
+
+    // 카테고리 및 검색어 상태 변경 시 
+    function search() {
+      let category = $("#category").val();
+      let searchWord = $("#searchWord").val();
+      console.log(category);
+      console.log(searchWord);
+      $.ajax({
+        url: "/manager/blackList/getList",
+        data: { "category": category, "searchWord": searchWord },
+        method: "GET",
+        success: function (list) {
+          $("#result").replaceWith(list);
+          $(".normalBtn").on("click", toNormal);
+        }
+      })
+
+    }
+
+    function init() {
+      $.ajax({
+        url: "/manager/blackList/getList",
+        method: "GET",
+        success: function (list) {
+          $("#result").replaceWith(list);
+          $(".normalBtn").on("click", toNormal);
+        }
+      });
+    }
+
+  </script>
+
+
+</head>
+
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+          <div class="navbar nav_title">
+            <a th:href="@{/manager/manager_index}" class="site_title">
+              <img th:src="@{/production/images/ec21logo.png}" alt="">
+            </a>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <!-- menu profile quick info -->
+          <div class="profile clearfix">
+            <div class="profile_pic">
+              <img th:src="@{/production/images/user.jpeg}" alt="..." class="img-circle profile_img">
+            </div>
+            <div class="profile_info">
+              <h2>김인영 님</h2>
+            </div>
+          </div>
+          <!-- /menu profile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+              <ul class="nav side-menu">
+                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/manager_index}">Dashboard</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-edit"></i> 상품관리 <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/productList}">전체 상품 조회</a></li>
+                    <li><a th:href="@{/manager/modelPredict}">모델 결과 조회</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-users"></i> 회원관리 <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a th:href="@{/manager/customerList}">전체 회원 조회</a></li>
+                    <li><a th:href="@{/manager/reportedCustomerList}">신고 회원 조회</a></li>
+                    <li><a th:href="@{/manager/blackList}">블랙 회원 조회</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      <div class="top_nav">
+        <div class="nav_menu">
+          <div class="nav toggle">
+            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+          </div>
+          <nav class="nav navbar-nav">
+            <ul class=" navbar-right">
+              <li class="nav-item dropdown open" style="padding-left: 15px;">
+                <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown"
+                  data-toggle="dropdown" aria-expanded="false">
+                  <img th:src="@{/production/images/user.jpeg}" alt="...">관리자
+                </a>
+                <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" th:href=@{/}><i class="fa fa-home pull-right"></i> Home</a>
+                  <a class="dropdown-item" th:href="@{/main/logout}"><i class="fa fa-sign-out pull-right"></i> Log
+                    Out</a>
+                </div>
+              </li>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <div class="">
+          <!-- <div class="page-title">
+            <div class="title_left">
+              <h3>Member <small>회원관리</small></h3>
+            </div>
+
+
+          </div> -->
+
+
+          <div class="row" style="display: block;">
+
+            <div class="col-md-12 col-sm-12  ">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h3>블랙 회원 조회</h2>
+
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="title_right">
+                  <div class="col-md-5 col-sm-5   form-group pull-right top_search">
+                    <div class="input-group">
+                      <!-- 240417 dy : select를 신고카테고리로 바꾸고, 검색어는 신고당한 회원ID, 담당자명, 회사명에서 검색되게 함 -->
+                      <select name="category" id="category">
+                        <option value="total">전체</option>
+                        <option value="DRUG">DRUG</option>
+                        <option value="IPR">IPR</option>
+                        <option value="SPAM">SPAM</option>
+                        <option value="ETC">ETC</option>
+                      </select>
+                      <input type="text" class="form-control" id="searchWord" placeholder="Search for...">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">찾기</button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="x_content">
+                  <div class="table-responsive">
+
+                    <table class="table table-striped jambo_table bulk_action" style="width: 100%;">
+                      <thead>
+                        <tr class="headings">
+                          <th class="column-title">no</th>
+                          <th class="column-title" style="width: 8%;">구분</th>
+                          <th class="column-title"> 회원 ID </th>
+                          <th class="column-title" style="width: 9%;">담당자명</th>
+                          <th class="column-title">회사명</th>
+                          <th class="column-title">부서명</th>
+                          <th class="column-title">국가IP</th>
+                          <th class="column-title" style="width: 9%;">블랙 <br> 카테고리</th>
+                          <th class="column-title">신고횟수</th>
+                          <th class="column-title no-link last"><span class="nobr"></span>
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <!-- 240414 dy : ajax로 블랙리스트 회원 정보 꽂아 처리 (ReportedCustomerWithInfoDTO 사용함)-->
+                      <tbody id="result">
+                        <tr class="even pointer" th:each="customer,i : ${list}">
+                          <td class="no" th:text="${i.index + 1}"></td>
+                          <td class=" " th:text="${customer.customerGubun}">셀러</td>
+                          <td class=" " th:text="${customer.reportedId}">121000040</td>
+                          <td class=" " th:text="${customer.customerName}">john</td>
+                          <td class=" " th:text="${customer.customerComp}">식품회사</td>
+                          <td class=" " th:text="${customer.customerDepartment}">해외영업</td>
+                          <td class=" " th:text="${customer.remoteIp}"> 121.172.252.00</td>
+                          <td class="a-right a-right " th:text="${customer.reportCategory}">마약</td>
+                          <td class=" " th:text="${customer.reportedCount}">#</td>
+                          <input type="hidden" name="" class="blacklistId" th:value="${customer.reportCustomerId}">
+                          <td class=" last">
+                            <input class="btn btn-info btn-xs normalBtn" type="button" value="정상">
+                          </td>
+                        </tr>
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /page content -->
+
+    </div>
+  </div>
+
+  <!-- jQuery -->
+  <script th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+  <!-- Bootstrap -->
+  <script th:src="@{/vendors/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+  <!-- FastClick -->
+  <script th:src="@{/vendors/fastclick/lib/fastclick.js}"></script>
+  <!-- NProgress -->
+  <script th:src="@{/vendors/nprogress/nprogress.js}"></script>
+  <!-- iCheck -->
+  <script th:src="@{/vendors/iCheck/icheck.min.js}"></script>
+  <!-- Custom Theme Scripts -->
+  <script th:src="@{/build/js/custom.min.js}"></script>
+</body>
+
+</html>

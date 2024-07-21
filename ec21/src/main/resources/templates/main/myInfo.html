@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- Meta Tag -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name='copyright' content=''>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Title Tag  -->
+	<title>EC21, Global B2B Marketplace</title>
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" th:href="@{/main/images/ec21logo.png}">
+	<!-- Web Font -->
+	<link 
+		href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+		rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+	<!-- StyleSheet -->
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" th:href="@{/main/css/bootstrap.css}">
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" th:href="@{/main/css/magnific-popup.min.css}">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" th:href="@{/main/css/font-awesome.css}">
+	<!-- Fancybox -->
+	<!-- <link rel="stylesheet" th:href="@{/main/css/jquery.fancybox.min.css}"> -->
+	<!-- Themify Icons -->
+	<link rel="stylesheet" th:href="@{/main/css/themify-icons.css}">
+	<!-- Nice Select CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/niceselect.css}">
+	<!-- Animate CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/animate.css}">
+	<!-- Flex Slider CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/flex-slider.min.css}">
+	<!-- Owl Carousel -->
+	<link rel="stylesheet" th:href="@{/main/css/owl-carousel.css}">
+	<!-- Slicknav -->
+	<link rel="stylesheet" th:href="@{/main/css/slicknav.min.css}">
+
+	<!-- Eshop StyleSheet -->
+	<link rel="stylesheet" th:href="@{/main/css/reset.css}">
+	<link rel="stylesheet" th:href="@{/main/css/style.css}">
+	<link rel="stylesheet" th:href="@{/main/css/responsive.css}">
+
+	<!-- Color CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/color/color2.css}">
+
+	<!-- 240420 iy : 수정버튼 클릭 시 readonly, disable 속성 삭제/ 수정완료 후 alert창 / 수정버튼 클릭 시 취소버튼 추가 -->
+	<!--240423 iy: 유효성 검사 진행중-->
+	<script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+	<script>
+		$(document).ready(function () {
+			// 원본 데이터 저장
+			var originalData = {};
+			$('input, select, textarea').each(function () {
+				var id = $(this).attr('id');
+				originalData[id] = $(this).val();
+			});
+
+			// Edit 버튼 클릭 이벤트
+			$("#editButton").click(function () {
+				// 필드 활성화
+				$('input, select, textarea').not('#customerId').prop('readonly', false);
+				$('input[type="radio"]').prop('disabled', false);
+				// 버튼 상태 변경
+				$(this).hide();
+				$("#modifyButton").show();
+				$("#cancelButton").show();
+				// 유효성 검사 활성화
+				activateValidation();
+			});
+
+			// 유효성 검사 활성화 함수
+			function activateValidation() {
+				$('#customerPw, #confirmPw, #email').on('keyup', function () {
+					validateField($(this));
+				});
+			}
+			// 각 필드의 유효성 검사
+			function validateField($field) {
+				var fieldId = $field.attr('id');
+				var value = $field.val();
+				var isValid = true;
+				var message = '';
+
+				switch (fieldId) {
+					case 'customerPw':
+						isValid = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,10}$/.test(value);
+						message = isValid ? 'Valid password' : 'Password must be at least 8 characters long and include at least one letter and one number';
+						break;
+					case 'confirmPw':
+						isValid = (value === $('#customerPw').val());
+						message = isValid ? 'Passwords match' : 'Passwords do not match';
+						break;
+					case 'email':
+						isValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(value);
+						message = isValid ? 'Valid email' : 'Invalid email format';
+						break;
+				}
+
+				// 메시지 표시
+				$field.next('.validation-message').text(message).css('color', isValid ? 'green' : 'red');
+				return isValid; // 유효성 검사 결과 반환
+			}
+
+			$("#modifyButton").click(function () {
+				// 필수 필드가 비어 있는지 확인
+				var isEmptyFieldPresent = false;
+				$('#customerPw, #confirmPw, #customerName, #email, #customerDepartment, #compName').each(function () {
+					if (!$(this).val()) {
+						alert('Please fill out this field: ' + $(this).prev('label').text());
+						$(this).focus();
+						isEmptyFieldPresent = true;
+						return false; // 빈 필드가 있으면 더 이상 검사하지 않고 중단
+					}
+				});
+
+				if (isEmptyFieldPresent) {
+					return; // 빈 필드가 있으면 여기서 처리 중단
+				}
+
+				// 빈 필드가 없으면 유효성 검사 수행
+				var isValidationPassed = true;
+				$('#customerPw, #confirmPw, #email').each(function () {
+					var isValid = validateField($(this)); // validateField 함수는 true/false를 반환해야 함
+					if (!isValid) {
+						$(this).focus();
+						isValidationPassed = false;
+						return false; // 유효성 검사를 통과하지 못하면 반복 중단
+					}
+				});
+
+				if (!isValidationPassed) {
+					return; // 유효성 검사를 통과하지 못하면 여기서 처리 중단
+				}
+
+				// 모든 검사를 통과했다면, 사용자에게 최종 확인을 요청
+				if (confirm("Are you sure you want to modify your account?")) {
+					$("#updateForm").submit(); // 폼 제출
+				}
+			});
+
+
+
+			// 필수 필드 검사
+			function checkRequiredFields() {
+				var isAllValid = true;
+				$('input[required]').each(function () {
+					if (!$(this).val()) {
+						alert('Please fill out this field: ' + $(this).prev('label').text());
+						$(this).focus();
+						isAllValid = false;
+						return false; // loop 탈출
+					}
+				});
+				return isAllValid;
+			}
+
+			// 개별 유효성 검사 메시지 확인
+			function checkValidationMessages() {
+				var isAllValid = true;
+				$('.validation-message').each(function () {
+					if ($(this).text() !== '') {
+						alert("Please correct the errors before submitting.");
+						$(this).prev('input').focus();
+						isAllValid = false;
+						return false; // loop 탈출
+					}
+				});
+				return isAllValid;
+			}
+
+			// Cancel 버튼 클릭 이벤트
+			$("#cancelButton").click(function () {
+				if (confirm("Are you sure you want to cancel the modifications?")) {
+					resetForm();
+				}
+			});
+
+			// 폼 리셋 함수
+			function resetForm() {
+				$('input, select, textarea').each(function () {
+					var id = $(this).attr('id');
+					$(this).val(originalData[id]).prop('readonly', true);
+					$(this).next('.validation-message').text('');
+				});
+				$('input[type="radio"]').prop('disabled', true);
+				$("#modifyButton").hide();
+				$("#editButton").show();
+				$("#cancelButton").hide();
+			}
+
+			// 받은 인콰이어리 개수
+			getInboxCount();
+		});
+
+		function getInboxCount() {
+			let customerId = $("#customerId").val();
+			// customerId가 anonymousUser가 아닌 경우 요청 보냄!! 
+			if (customerId !== "anonymousUser") { 
+				$.ajax({
+					url: "/main/index/getInboxCount",
+					data: { "customerId": customerId },
+					method: "GET",
+					success: function (resp) {
+						console.log(resp);
+						$("#iboxCount").text(resp);
+					}
+				});
+			}
+		}
+	</script>
+
+
+</head>
+
+<body class="js">
+	<input type="hidden" id="customerId" th:value="${#authentication.name}">
+	<!-- Preloader -->
+	<!-- <div class="preloader">
+		<div class="preloader-inner">
+			<div class="preloader-icon">
+				<span></span>
+				<span></span>
+			</div>
+		</div>
+	</div> -->
+	<!-- End Preloader -->
+	
+	<!-- Header -->
+	<header class="header shop">
+		<!-- Topbar -->
+		<div class="topbar">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-4 col-md-12 col-12">
+						<!-- Top Left -->
+						<div class="top-left">
+							<!-- logo -->
+							<div class="logo">
+								<a th:href="@{/}">
+									<img th:src="@{/main/images/ec21logo.png}" alt="logo" style="width: 100px; height: 30px;">
+								</a>
+							</div>
+						</div>
+						<!--/ End Top Left -->
+					</div>
+					<div class="col-lg-8 col-md-12 col-12">
+						<!-- Top Right -->
+						<div class="right-content">
+							<ul class="list-main">
+								<li sec:authorize="isAnonymous()"><i class="ti-power-off"></i><a th:href="@{/main/login}">Login</a></li>
+								<li sec:authorize="isAnonymous()"><i class="ti-user"></i><a th:href="@{/main/register}">Sign up</a></li>
+								<li sec:authorize="isAuthenticated()"><i class="ti-power-off"></i><a th:href="@{/main/logout}">Logout</a></li>
+								<li><a th:href="@{/main/myproducts(customerId=${#authentication.name})}"><i class="fa fa-user-circle-o" aria-hidden="true"></i><span sec:authorize="isAuthenticated()">[[${#authentication.name}]]</span></a></li>
+								<li><a th:href="@{/main/inbox(customerId=${#authentication.name})}" class="single-icon">
+									<i class="fa fa-envelope-o"></i>
+									<span sec:authorize="isAuthenticated()" class="total-count" id="iboxCount"></span>
+									</a>
+								</li>
+								</ul>
+							</div>
+							<!-- End Top Right -->
+						</div>
+					</div>
+				</div>
+			</div>
+		<!-- End Topbar -->
+	</header>
+	
+	<!-- myInfo -->
+	<section class="product shop section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-2 col-12 ">
+						<div id="accordion">
+							<div class="card">
+								<div class="card-header">
+									<a class="card-link" data-toggle="collapse" href="#account-category">My Account</a>
+								</div>
+								<div id="account-category" class="collapse show" data-parent="#accordion">
+									<div class="card-body">
+										<ul class="categor-list">
+											<li><a th:href="@{/main/myinfo(customerId=${#authentication.name})}">My Information</a></li>
+											<li><a th:href="@{/main/myproducts(customerId=${#authentication.name})}">My Products</a></li>
+											<li><a th:href="@{/main/productsWrite(customerId=${#authentication.name})}">Add A New</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+								<a class="collapsed card-link" data-toggle="collapse" href="#product-category">To Product</a>
+							</div>
+							<div id="product-category" class="collapse" data-parent="#accordion">
+								<div class="card-body">
+									<ul class="categor-list">
+										<li><a th:href="@{/main/list(category=total)}">All</a></li>
+										<li><a th:href="@{/main/list(category=FOOD_BEVERAGE)}">Food & Beverage</a></li>
+										<li><a th:href="@{/main/list(category=CHEMICAL)}">Chemical</a></li>
+										<li><a th:href="@{/main/list(category=HEALTH_MEDICAL)}">Health & Medical</a></li>
+										<li><a th:href="@{/main/list(category=ELECTRONIC)}">Electronics</a></li>
+										<li><a th:href="@{/main/list(category=COSMETIC)}">Cosmetic</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 카테고리 종료 -->
+				<div class="col-lg-9 col-12">
+					<div class="row">
+						<div class="shop myinfo section">
+							<div class="container">
+								<div class="row">
+									<div class="col-12">
+										<!-- Shop Top -->
+										<div class="user-image">
+											<img th:src="@{/main/images/user.png}" alt="">
+										</div>
+										<h2>Personal Info</h2>
+										<!-- Form -->
+										
+										<div>
+											<form class="form" method="post" id="updateForm" th:action="@{/main/myinfo/updateCustomer}">
+											
+
+											<div class="form-group">
+												<label>ID</label>
+												<input type="text" name="customerId" id="customerId"
+												th:value="${customer.customerId}" required="required" readonly>
+											</div>
+											
+											<div class="form-group">
+												<label for="customerPw">Password</label>
+												<input type="password" id="customerPw" name="customerPw"
+												th:value="${customer.customerPw}" required="required" readonly>
+												<span class="validation-message"></span>
+											</div>
+											
+											
+											<div class="form-group">
+												<label>Confirm Password</label>
+												<input type="password" id="confirmPw" name="confirmPw"
+												required="required" readonly>
+												<span class="validation-message"></span>
+											</div>
+											
+											<div class="form-group">
+												<label>Name</label>
+												<input type="text" id="customerName" name="customerName"
+												th:value="${customer.customerName}" required="required"
+												readonly>
+											</div>
+											
+											<div class="form-group">
+												<label>Email</label>
+												<input type="text" id="email" name="email"
+												th:value="${customer.email}" required="required" readonly>
+												<span class="validation-message"></span>
+											</div>
+											
+											<div class="form-group">
+												<label>Department<span>*</span></label>
+												<input type="text" id="customerDepartment" name="customerDepartment"
+												th:value="${customer.customerDepartment}" required="required"
+												readonly>
+											</div>
+											
+											<div class="form-group">
+												<label class="gubun">I am a</label>
+												<div>
+													<input type="radio" class="gubun"
+													th:checked="${customer.customerGubun.name() == 'B'}" name="customerGubun" value="B" disabled>
+													Buyer
+													<input type="radio" class="gubun"
+													th:checked="${customer.customerGubun.name() == 'S'}" name="customerGubun" value="S" disabled>
+													Seller
+													<input type="radio" class="gubun" th:checked="${customer.customerGubun.name() == 'A'}"
+													name="customerGubun" value="A" disabled>
+													Seller & Buyer
+												</div>
+											</div>
+												
+												<!-- 회사 정보 -->
+												<div class="form-group title">
+													<label>Company Information</label>
+												</div>
+												
+												
+												<div class="form-group">
+													<label>Company Name</label>
+													<input type="text" id="compName" name="compName" th:value="${customer.compName}" required="required" readonly>
+												</div>
+												
+												<div class="form-group">
+													<label>Company Description</label> <br>
+														<input type="textarea" id="compDesc" name="compDesc" th:value="${customer.compDesc}" required="required" readonly>
+													</div>
+													
+													<div class="form-group">
+														<label>Company Url</label><br>
+														<input type="text" id="compUrl" name="compUrl" th:value="${customer.compUrl}" required="required" readonly>
+													</div>
+				
+												<div class="form-group">
+													<label>Company Address</label><br>
+													<input type="text" id="address" name="address" th:value="${customer.address}" required="required" readonly>
+												</div>
+												
+												<div class="form-group">
+													<label>Zip No</label> <br>
+													<input type="text" id="zipNo" name="zipNo" th:value="${customer.zipNo}" required="required" readonly>
+												</div>
+												
+												<div class="form-group">
+													<label>Fax No</label> <br>
+													<input type="text" name="faxNo" th:value="${customer.faxNo}" required="required" readonly>
+												</div>
+											
+											<div class="form-group">
+												<label>Business No</label>
+												<br>
+												<input type="text" name="busiNo" th:value="${customer.busiNo}"
+												required="required" readonly>
+											</div>
+											
+											<div class="form-group">
+												<label>Trade No</label> <br>
+												<input type="text" name="tradeNo" th:value="${customer.tradeNo}"
+												required="required" readonly>
+											</div>
+											
+											<br>
+											
+											<div class="form-group info-btn">
+												<button class="btn" type="button" id="editButton">Edit My Account</button>
+												<button class="btn" type="button" id="modifyButton" style="display: none;">Modify My Account</button>
+												<button class="btn" type="button" id="cancelButton" style="display: none;">Cancel</button>
+											</div>
+										<input type="hidden" name="customerId" id="customerId" th:value="${#authentication.name}">
+									</form>
+								</div>
+							</div>
+							</div>
+							<!--/ End Form -->
+						</div>
+					</div>	
+				</div>
+			</div>
+		</div>
+	</section>
+
+
+	
+	<!-- Start Footer Area -->
+	<footer class="footer">
+		<!-- Footer Top -->
+		<div class="footer-top section">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>About Us</h4>
+							<ul>
+								<li><a href="#">Company Overview</a></li>
+								<li><a href="#">Agent Program</a></li>
+								<li><a href="#">Advertise with us</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Buying on EC21</h4>
+							<ul>
+								<li><a href="#">Post Buying Leads</a></li>
+								<li><a href="#">Browse Category</a></li>
+								<li><a href="#">Products by Keywords</a></li>
+								<li><a href="#">Products by Country</a></li>
+								<li><a href="#">Idea Products</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+
+					<!-- Single Widget -->
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Selling on EC21</h4>
+							<ul>
+								<li><a href="#">Post Products</a></li>
+								<li><a href="#">Manage Products</a></li>
+								<li><a href="#">Post Selling Leads</a></li>
+								<li><a href="#">Search Buying Leads</a></li>
+								<li><a href="#">Search Buyer Data</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Services</h4>
+							<ul>
+								<li><a href="#">Basic Services</a></li>
+								<li><a href="#">Trade PRO</a></li>
+								<li><a href="#">Trade OK</a></li>
+								<li><a href="#">Credit Reports</a></li>
+								<li><a href="#">TradeVerify</a></li>
+							</ul>
+						</div>
+					</div>
+					<!-- End Single Widget -->
+					<div class="col-lg-3 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer social">
+							<h4>Share this page</h4>
+							<ul>
+								<li><a href="#"><i class="ti-facebook"></i></a></li>
+								<li><a href="#"><i class="ti-twitter"></i></a></li>
+								<li><a href="#"><i class="ti-flickr"></i></a></li>
+								<li><a href="#"><i class="ti-instagram"></i></a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Footer Top -->
+		<div class="copyright">
+			<div class="container">
+				<div class="inner">
+					<div class="row">
+						<div class="col-lg-6 col-12">
+							<div class="left">
+								<p>Copyright © 1997-2024 <a href="https://www.ec21.com/" target="_blank">EC21 Inc.</a>
+									All Rights Reserved. EC21 in Korean | Chinese Business Registry Number: 120-86-03931
+								</p>
+							</div>
+						</div>
+						<div class="col-lg-6 col-12">
+							<div class="right">
+								<img th:src="@{/main/images/payments.png}" alt="#">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- /End Footer Area -->
+
+	<!-- Jquery -->
+	<script th:src="@{/main/js/jquery.min.js}"></script>
+	<script th:src="@{/main/js/jquery-migrate-3.0.0.js}"></script>
+	<script th:src="@{/main/js/jquery-ui.min.js}"></script>
+	<!-- Popper JS -->
+	<script th:src="@{/main/js/popper.min.js}"></script>
+	<!-- Bootstrap JS -->
+	<script th:src="@{/main/js/bootstrap.min.js}"></script>
+	<!-- Color JS -->
+	<script th:src="@{/main/js/colors.js}"></script>
+	<!-- Slicknav JS -->
+	<script th:src="@{/main/js/slicknav.min.js}"></script>
+	<!-- Owl Carousel JS -->
+	<script th:src="@{/main/js/owl-carousel.js}"></script>
+	<!-- Magnific Popup JS -->
+	<script th:src="@{/main/js/magnific-popup.js}"></script>
+	<!-- Fancybox JS -->
+	<script th:src="@{/main/js/facnybox.min.js}"></script>
+	<!-- Waypoints JS -->
+	<script th:src="@{/main/js/waypoints.min.js}"></script>
+	<!-- Countdown JS -->
+	<script th:src="@{/main/js/finalcountdown.min.js}"></script>
+	<!-- Nice Select JS -->
+	<script th:src="@{/main/js/nicesellect.js}"></script>
+	<!-- Flex Slider JS -->
+	<script th:src="@{/main/js/flex-slider.js}"></script>
+	<!-- ScrollUp JS -->
+	<script th:src="@{/main/js/scrollup.js}"></script>
+	<!-- Onepage Nav JS -->
+	<script th:src="@{/main/js/onepage-nav.min.js}"></script>
+	<!-- Easing JS -->
+	<script th:src="@{/main/js/easing.js}"></script>
+	<!-- Active JS -->
+	<script th:src="@{/main/js/active.js}"></script>
+</body>
+
+</html>

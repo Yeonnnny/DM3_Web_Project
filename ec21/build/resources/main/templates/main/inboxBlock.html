@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- Meta Tag -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name='copyright' content=''>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Title Tag  -->
+	<title>EC21, Global B2B Marketplace</title>
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" th:href="@{/main/images/ec21logo.png}">
+	<!-- Web Font -->
+	<link
+		href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+		rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+	<!-- StyleSheet -->
+	<!-- Bootstrap -->
+	<link rel="stylesheet" th:href="@{/main/css/bootstrap.css}">
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" th:href="@{/main/css/magnific-popup.min.css}">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" th:href="@{/main/css/font-awesome.css}">
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"> -->
+	<!-- <link th:href="@{../vendors/font-awesome/css/font-awesome.min.css}" rel="stylesheet"> -->
+	<!-- Fancybox -->
+	<link rel="stylesheet" th:href="@{/main/css/fancybox.css}">
+	<!-- Themify Icons -->
+	<link rel="stylesheet" th:href="@{/main/css/themify-icons.css}">
+	<!-- Nice Select CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/niceselect.css}">
+	<!-- Animate CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/animate.css}">
+	<!-- Flex Slider CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/flex-slider.min.css}">
+	<!-- Owl Carousel -->
+	<link rel="stylesheet" th:href="@{/main/css/owl-carousel.css}">
+	<!-- Slicknav -->
+	<link rel="stylesheet" th:href="@{/main/css/slicknav.min.css}">
+
+	<!-- Eshop StyleSheet -->
+	<link rel="stylesheet" th:href="@{/main/css/reset.css}">
+	<link rel="stylesheet" th:href="@{/main/css/style.css}">
+	<link rel="stylesheet" th:href="@{/main/css/responsive.css}">
+	<link rel="stylesheet" th:href="@{/main/css/inbox.css}">
+
+	<!-- Color CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/color/color2.css}">
+
+	<!-- modal -->
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+	<!-- 240421 dy : ajax.. -->
+	<script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+	<script>
+		$(function () {
+
+			// 모달 변수 초기화
+			var modal = $("#reportModal");
+			// 닫기 버튼 이벤트
+			$("#closeBtn").on("click", function (event) {
+				modal.hide();
+			});
+			// 모달 백그라운드 클릭 이벤트
+			$(window).on("click", function (event) {
+				if ($(event.target).is(modal)) {
+					modal.hide();
+				}
+			});
+
+			// 모달창 값 채우기 & 모달창 열기
+			$(document).on("click", "a[id^='modalBtn']", function () {
+				let blockedId = $(this).attr("data-id");
+
+				// 모달 값 채우기
+				$("#modalBlockedId").text(blockedId);
+				$("#submitBtn").on("click", submitReport);
+				// 모달열기
+				$("#reportModal").modal();
+
+			}); // End 모달 클릭 이벤트
+
+			init();
+		});
+
+		// 신고 내용 GET 방식으로 보내기
+		function submitReport() {
+			let reportedId = $("#modalBlockedId").text();
+			let reportCategory = document.querySelector('input[name="reportCategory"]:checked').value;
+			let reportReason = $("#modalReportReason").val();
+			let managerCheck = 'N';
+
+			if (confirm("Processing completed.")) {
+				$.ajax({
+					url: "/inbox/report",
+					data: { "reportedId": reportedId, "reportCategory": reportCategory, "reportReason": reportReason, "managerCheck": managerCheck },
+					method: "get",
+					success: function (resp) {
+						if (resp) {
+							$("#closeBtn").click();
+						}
+					}
+				});
+			}
+		}
+
+		// 블락 해제하는 함수
+		function toUnBlock(element) {
+			let customerId = $("#hiddenCustomerId").val();
+			let inquiryBlockId = element.getAttribute("data-id");
+			let blockedId = element.getAttribute("data-blockedId");
+			if (confirm("[" + blockedId + "] Would you like to unblock this?")) {
+				$.ajax({
+					url: "/inbox/block/getList",
+					data: { "customerId": customerId, "inquiryBlockId": inquiryBlockId },
+					method: "GET",
+					success: function (blockList) {
+						$("#result").replaceWith(blockList);
+						// 리스트 사이즈 
+						var htmlString = blockList;
+						var parser = new DOMParser();
+						var doc = parser.parseFromString(htmlString, 'text/html');
+						var trCount = doc.querySelectorAll('tr').length;
+						$("#listSize").text(trCount - 1); // thead의 tr도 포함된 개수이기 때문에 -1해줌
+					}
+				});
+			}
+		}
+
+		// 인콰이어리 블락 회원 리스트 가져오기
+		function init() {
+			let customerId = $("#hiddenCustomerId").val();
+			$.ajax({
+				url: "/inbox/block/getList",
+				data: { "customerId": customerId },
+				method: "GET",
+				success: function (blockList) {
+					$("#result").replaceWith(blockList);
+					// 리스트 사이즈 
+					var htmlString = blockList;
+					var parser = new DOMParser();
+					var doc = parser.parseFromString(htmlString, 'text/html');
+					var trCount = doc.querySelectorAll('tr').length;
+					$("#listSize").text(trCount - 1); // thead의 tr도 포함된 개수이기 때문에 -1해줌
+
+				}
+			});
+		}
+
+		$(document).ready(function () {
+			$('.ipElement').each(function () { // 'ipElement' 클래스를 가진 모든 요소에 대해 반복
+				var ipElement = $(this); // 현재 반복 중인 요소
+				console.log(ipElement);
+				var remoteIp = ipElement.text().trim(); // 텍스트 가져오기 및 공백 제거
+				console.log(ipElement.text().trim()); // 각 요소의 텍스트 확인
+
+				if (!remoteIp) { // IP 주소가 없을 경우 예외 처리
+					console.log("IP 주소가 없습니다.");
+					return;
+				}
+
+				if (remoteIp.length <= 3) { // 3자리 이하일 경우 마스킹
+					ipElement.text('***');
+				} else { // 4자리 이상일 경우 마지막 세 자리를 마스킹
+					ipElement.text(remoteIp.slice(0, -3) + '***');
+				}
+			});
+		});
+
+
+	</script>
+</head>
+
+<body class="js">
+	<input type="hidden" id="hiddenCustomerId" th:value="${customerId}">
+
+	<!-- Preloader -->
+	<!-- <div class="preloader">
+		<div class="preloader-inner">
+			<div class="preloader-icon">
+				<span></span>
+				<span></span>
+			</div>
+		</div>
+	</div> -->
+	<!-- End Preloader -->
+
+	<!-- Header -->
+	<header class="header shop">
+		<!-- Topbar -->
+		<div class="topbar">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-4 col-md-12 col-12">
+						<!-- Top Left -->
+						<div class="top-left">
+							<!-- logo -->
+							<div class="logo">
+								<a th:href="@{/}">
+									<img th:src="@{/main/images/ec21logo.png}" alt="logo" style="left: 44%;">
+								</a>
+							</div>
+						</div>
+						<!--/ End Top Left -->
+					</div>
+					<div class="col-lg-8 col-md-12 col-12">
+						<!-- Top Right -->
+						<div class="right-content">
+							<ul class="list-main">
+								<li sec:authorize="isAnonymous()"><i class="ti-power-off"></i><a
+										th:href="@{/main/login}">Login</a></li>
+								<li sec:authorize="isAnonymous()"><i class="ti-user"></i><a
+										th:href="@{/main/register}">Sign up</a></li>
+								<li sec:authorize="isAuthenticated()"><i class="ti-power-off"></i><a
+										th:href="@{/main/logout}">Logout</a></li>
+								<li sec:authorize="isAuthenticated()"><a
+										th:href="@{/main/myproducts(customerId=${#authentication.name})}"><i
+											class="fa fa-user-circle-o" aria-hidden="true"></i>
+										<span sec:authorize="isAuthenticated()">[[${#authentication.name}]]</span></a>
+								</li>
+							</ul>
+						</div>
+						<!-- End Top Right -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Header Inner -->
+		<div class="header-inner">
+			<div class="container">
+				<div class="cat-nav-head">
+					<div class="row">
+					</div>
+					<div class="col-lg-9 col-12">
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--/ End Header Inner -->
+	</header>
+	<!--/ End Header -->
+
+
+	<!-- 인콰이어리 목록 -->
+	<section class="inquiry-area">
+		<div class="main-container">
+			<aside class="shop-sidebar">
+				<!-- Single Widget 인콰이어리 카테고리 -->
+				<div class="single-widget inquiry-category">
+					<h3 Inquiry class="inquiry-title">My Inquiry</h3>
+					<ul class="categor-list">
+						<li><a th:href="@{/main/inbox(customerId=${customerId})}">Received</a></li>
+						<li><a th:href="@{/main/inboxSent(customerId=${customerId})}">Sent</a></li>
+						<li><a th:href="@{/main/inboxSaved(customerId=${customerId})}">Saved</a></li>
+						<li><a th:href="@{/main/inboxSpam(customerId=${customerId})}">Spam</a></li>
+						<li><a th:href="@{/main/inboxBlock(customerId=${customerId})}" style="color: #439eff;">Block
+								<span id="listSize"></span></a>
+						</li>
+						<li><a th:href="@{/main/inboxTrash(customerId=${customerId})}">Trash</a></li>
+					</ul>
+				</div>
+				<!--/ End Single Widget -->
+			</aside>
+
+			<!-- My inquiry List -->
+			<div class="shopping-cart section">
+				<div>
+					<table class="table shopping-summery inquiry" id="result">
+						<thead>
+							<tr class="main-hading">
+								<th>BLOCKED MEMBER ID</th>
+								<th>COMPANY NAME</th>
+								<th>COUNTRY</th>
+								<th>REMOTE IP</th>
+								<th>UN BLOCK</th>
+								<th>REPORT</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- 240423 dy : 인콰이어리 블락 회원 정보 출력 -->
+							<tr th:if="${blockList == null and #lists.isEmpty(blockList)}">
+								<td colspan="6">No result</td>
+							</tr>
+
+							<tr th:unless="${blockList == null and #lists.isEmpty(blockList)}"
+								th:each="blocked : ${blockList}">
+								<!-- 블락된 회원 아이디 -->
+								<td class="blockedId" data-title="blockedId">
+									<span class="blockedId" th:text="${blocked.blockedId}"></span>
+								</td>
+								<td class="compName" data-title="compName">
+									<span class="compName" th:text="${blocked.compName}"></span>
+								</td>
+								<!-- 국가 -->
+								<td class="country" data-title="country">
+									<span class="country" th:text="${blocked.country}"></span>
+								</td>
+								<!-- ip 주소인데 뒷자리 3개는 * 표 표시 -->
+								<td class="remoteIp" data-title="remoteIp">
+									<span th:if="${blocked.remoteIp != null}"
+										th:text="${@stringProcessor.maskIpAddress(blocked.remoteIp)}"></span>
+								</td>
+
+								<!-- unBlock -->
+								<td data-title="unBlock">
+									<a href="javascript:void(0);" class="unBlockBtn"
+										th:data-id="${blocked.inquiryBlockId}" th:data-blockedId="${blocked.blockedId}"
+										onclick="toUnBlock(this)">
+										<i class="fa fa-mail-reply"></i>
+									</a>
+								</td>
+								<!-- 신고버튼 -->
+								<td data-title="report">
+									<span>
+										<a class="report" data-toggle="modal" data-target="#reportModal"
+											th:id="'modalBtn'+${blocked.inquiryBlockId}"
+											th:data-id="${blocked.blockedId}">
+											<i class="fa fa-paper-plane-o"></i></a>
+									</span>
+								</td>
+							</tr>
+
+						</tbody>
+					</table>
+					<!--/ End inquiry List -->
+				</div>
+			</div>
+			<!--/ End Shopping Cart -->
+		</div>
+	</section>
+
+	<!-- Report Modal -->
+	<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<form class="form" action="#" method="post" id="reportForm">
+					<!-- Modal Header -->
+					<div class="modal-header" style="height: 10px;">
+						<h4 class="modal-title" id="modalInquiryTitle">Report</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<!-- Modal Body -->
+					<div class="modal-body" style="height: 20%;">
+						<table>
+							<tr>
+								<td colspan="2">Would you like to report <span id="modalBlockedId"
+										name="reportedId"></span>?</td>
+							</tr>
+							<tr>
+								<th class="" colspan="2">Report Reason</th>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<input type="radio" name="reportCategory" value="DRUG"> <span>Drug</span>
+									<input type="radio" name="reportCategory" value="IPR"> <span>Intellectual Property
+										Rights</span>
+									<input type="radio" name="reportCategory" value="SPAM"> <span>Multiple Emails</span>
+									<input type="radio" name="reportCategory" value="ETC"> <span>etc</span>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2"><textarea name="reportReason" id="modalReportReason" cols="30"
+										rows="10"></textarea>
+								</td>
+							</tr>
+							<input type="hidden" name="managerCheck" value="N">
+						</table>
+					</div>
+					<!-- Modal Footer -->
+					<div class="modal-footer">
+						<button type="button" id="submitBtn" class="btn" data-dismiss="modal">Report</button>
+						<button type="button" id="closeBtn" class="btn" data-dismiss="modal">Close</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	</div>
+	<!--/ End Product Style 1  -->
+
+	<!-- Start Footer Area -->
+	<footer class="footer">	
+		<div class="copyright" style="margin-left: 69px;">
+			<div class="container">
+				<div class="inner">
+					<div class="row">
+						<div class="col-lg-6 col-12">
+							<div class="left">
+								<p>Copyright © 1997-2024 <a href="https://www.ec21.com/" target="_blank">EC21 Inc.</a>
+									All Rights Reserved. EC21 in Korean | Chinese Business Registry Number: 120-86-03931
+								</p>
+							</div>
+						</div>
+						<div class="col-lg-6 col-12">
+							<div class="right">
+								<img th:src="@{/main/images/payments.png}" alt="#">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- /End Footer Area -->
+
+
+	<!-- Jquery -->
+	<script th:src="@{/main/js/jquery.min.js}"></script>
+	<script th:src="@{/main/js/jquery-migrate-3.0.0.js}"></script>
+	<script th:src="@{/main/js/jquery-ui.min.js}"></script>
+	<!-- Popper JS -->
+	<script th:src="@{/main/js/popper.min.js}"></script>
+	<!-- Bootstrap JS -->
+	<script th:src="@{/main/js/bootstrap.min.js}"></script>
+	<!-- Color JS -->
+	<script th:src="@{/main/js/colors.js}"></script>
+	<!-- Slicknav JS -->
+	<script th:src="@{/main/js/slicknav.min.js}"></script>
+	<!-- Owl Carousel JS -->
+	<script th:src="@{/main/js/owl-carousel.js}"></script>
+	<!-- Magnific Popup JS -->
+	<script th:src="@{/main/js/magnific-popup.js}"></script>
+	<!-- Fancybox JS -->
+	<script th:src="@{/main/js/facnybox.min.js}"></script>
+	<!-- Waypoints JS -->
+	<script th:src="@{/main/js/waypoints.min.js}"></script>
+	<!-- Countdown JS -->
+	<script th:src="@{/main/js/finalcountdown.min.js}"></script>
+	<!-- Nice Select JS -->
+	<script th:src="@{/main/js/nicesellect.js}"></script>
+	<!-- Ytplayer JS -->
+	<!-- <script th:src="@{/main/js/ytplayer.min.js}"></script> -->
+	<!-- Flex Slider JS -->
+	<script th:src="@{/main/js/flex-slider.js}"></script>
+	<!-- ScrollUp JS -->
+	<script th:src="@{/main/js/scrollup.js}"></script>
+	<!-- Onepage Nav JS -->
+	<script th:src="@{/main/js/onepage-nav.min.js}"></script>
+	<!-- Easing JS -->
+	<script th:src="@{/main/js/easing.js}"></script>
+	<!-- Active JS -->
+	<script th:src="@{/main/js/active.js}"></script>
+	<!-- myFunction JS : 필요한 자바 스크립트 이리로 넣어서 사용하면 됩니다 -->
+	<script th:src="@{/main/js/myFunction.js}"></script>
+
+</body>
+
+</html>

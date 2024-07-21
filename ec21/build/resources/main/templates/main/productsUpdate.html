@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <!-- Meta Tag -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name='copyright' content=''>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Title Tag  -->
+    <title>EC21, Global B2B Marketplace</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" th:href="@{/main/images/ec21logo.png}">
+    <!-- Web Font -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+    <!-- StyleSheet -->
+    <!-- Bootstrap -->
+    <link rel="stylesheet" th:href="@{/main/css/bootstrap.css}">
+    <!-- Magnific Popup -->
+    <link rel="stylesheet" th:href="@{/main/css/magnific-popup.min.css}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" th:href="@{/main/css/font-awesome.css}">
+    <!-- Fancybox -->
+    <link rel="stylesheet" th:href="@{/main/css/jquery.fancybox.min.css}">
+    <!-- Themify Icons -->
+    <link rel="stylesheet" th:href="@{/main/css/themify-icons.css}">
+    <!-- Nice Select CSS -->
+    <link rel="stylesheet" th:href="@{/main/css/niceselect.css}">
+    <!-- Animate CSS -->
+    <link rel="stylesheet" th:href="@{/main/css/animate.css}">
+    <!-- Flex Slider CSS -->
+    <link rel="stylesheet" th:href="@{/main/css/flex-slider.min.css}">
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" th:href="@{/main/css/owl-carousel.css}">
+    <!-- Slicknav -->
+    <link rel="stylesheet" th:href="@{/main/css/slicknav.min.css}">
+
+    <!-- Eshop StyleSheet -->
+    <link rel="stylesheet" th:href="@{/main/css/reset.css}">
+    <link rel="stylesheet" th:href="@{/main/css/style.css}">
+    <link rel="stylesheet" th:href="@{/main/css/responsive.css}">
+
+    <!-- Color CSS -->
+    <link rel="stylesheet" th:href="@{/main/css/color/color2.css}">
+
+    <link rel="stylesheet" href="#" id="colors">
+
+    <!-- JQuery -->
+    <script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+    <!-- CK Editor -->
+    <script th:src="@{/script/ckeditor.js}"></script>
+    <script>
+        $(function () {
+            // CKEditor 초기화 및 인스턴스 생성
+            let ckEditorInstance;
+            let productDesc = $("#desc").val();
+            ClassicEditor.create(document.querySelector("#ckeditor"), {
+                language: "ko"
+            }).then(editor => {
+                // 기존의 값으로 editor 초기화
+                editor.setData(productDesc);
+                // 에디터 인스턴스를 저장
+                ckEditorInstance = editor;
+                
+            }).catch(error => {
+                console.error(error);
+            });
+    
+            $("#submitBtn").on("click", function () {
+                alert("상품 수정을 진행합니다.");
+                let contents = ckEditorInstance.getData().trim();
+                console.log(contents);
+                // DB에 저장하기 위해 CK editor에 값 넣기
+                $("#productDesc").val(contents);
+    
+                $("#updateForm").submit();
+            });
+
+            getInboxCount();
+        });
+
+        // 받은 인콰이어리 개수 반환
+        function getInboxCount() {
+			let customerId = $("#customerId").val();
+			// customerId가 anonymousUser가 아닌 경우 요청 보냄!! 
+			if (customerId !== "anonymousUser") { 
+				$.ajax({
+					url: "/main/index/getInboxCount",
+					data: { "customerId": customerId },
+					method: "GET",
+					success: function (resp) {
+						console.log(resp);
+						$("#iboxCount").text(resp);
+					}
+				});
+			}
+		}
+    </script>
+
+</head>
+
+<body class="js">
+    <input type="hidden" name="" id="desc" th:value="${product.productDesc}">
+    <input type="hidden" name="" id="customerId" th:value="${#authentication.name}">
+    <!-- Preloader -->
+    <!-- <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div> -->
+    <!-- End Preloader -->
+
+    <!-- Header -->
+    <header class="header shop">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-12 col-12">
+                        <!-- Top Left -->
+                        <div class="top-left">
+                        </div>
+                        <!--/ End Top Left -->
+                    </div>
+                    <div class="col-lg-8 col-md-12 col-12">
+                        <!-- Top Right -->
+                        <div class="right-content">
+                            <ul class="list-main">
+                                <li sec:authorize="isAnonymous()"><i class="ti-power-off"></i><a th:href="@{/main/login}">Login</a></li>
+								<li sec:authorize="isAnonymous()"><i class="ti-user"></i><a th:href="@{/main/register}">Sign up</a></li>
+								<li sec:authorize="isAuthenticated()"><i class="ti-power-off"></i><a th:href="@{/main/logout}">Logout</a></li>
+                                <li><a th:href="@{/main/myproducts(customerId=${#authentication.name})}"><i class="fa fa-user-circle-o"
+                                    aria-hidden="true"></i><span sec:authorize="isAuthenticated()">[[${#authentication.name}]]</span> </a></li>
+                                <li><a th:href="@{/main/inbox(customerId=${#authentication.name})}" class="single-icon">
+                                    <i class="fa fa-envelope-o"></i>
+                                    <span sec:authorize="isAuthenticated()" class="total-count" id="iboxCount"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- End Top Right -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Topbar -->
+        <div class="middle-inner">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-2 col-md-2 col-12">
+                        <!-- Logo -->
+                        <div class="logo">
+                            <a th:href="@{/}"><img th:src="@{/main/images/ec21logo.png}" alt="logo"></a>
+                        </div>
+                        <!--/ End Logo -->
+                        <!-- Search Form -->
+                        <div class="search-top">
+                            <div class="top-search"><a href="#"><i class="ti-search"></i></a></div>
+                            <!-- Search Form -->
+                            <div class="search-top">
+                                <form class="search-form">
+                                    <input type="text" placeholder="Search here..." name="search">
+                                    <button value="search" type="submit"><i class="ti-search"></i></button>
+                                </form>
+                            </div>
+                            <!--/ End Search Form -->
+                        </div>
+                        <!--/ End Search Form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--/ End Header -->
+    <!-- Breadcrumbs : 사이트 내 경로 -->
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="bread-inner">
+                        <ul class="bread-list">
+                            <li><a th:href="@{/}">Home<i class="ti-arrow-right"></i></a></li>
+                            <li class="active"><a href="#">Products</a></li>
+                            <li><i class="ti-arrow-right"></i></a></li>
+                            <li class="active"><a th:href="@{/main/productsWrite(customerId=${#authentication.name})}">Update Product</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Breadcrumbs -->
+
+    <!-- 상품 수정 화면 -->
+    <section class="product-area shop-sidebar product-list shop section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-2 col-12 ">
+						<div id="accordion">
+							<div class="card">
+								<div class="card-header">
+									<a class="card-link" data-toggle="collapse" href="#account-category">My Account</a>
+								</div>
+								<div id="account-category" class="collapse show" data-parent="#accordion">
+									<div class="card-body">
+										<ul class="categor-list">
+											<li><a th:href="@{/main/myinfo(customerId=${#authentication.name})}">My Information</a></li>
+											<li><a th:href="@{/main/myproducts(customerId=${#authentication.name})}">My Products</a></li>
+											<li><a th:href="@{/main/productsWrite(customerId=${#authentication.name})}">Add A New</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header">
+								<a class="collapsed card-link" data-toggle="collapse" href="#product-category">To Product</a>
+							</div>
+							<div id="product-category" class="collapse" data-parent="#accordion">
+								<div class="card-body">
+									<ul class="categor-list">
+										<li><a th:href="@{/main/list(category=total)}">All</a></li>
+										<li><a th:href="@{/main/list(category=FOOD_BEVERAGE)}">Food & Beverage</a></li>
+										<li><a th:href="@{/main/list(category=CHEMICAL)}">Chemical</a></li>
+										<li><a th:href="@{/main/list(category=HEALTH_MEDICAL)}">Health & Medical</a></li>
+										<li><a th:href="@{/main/list(category=ELECTRONIC)}">Electronics</a></li>
+										<li><a th:href="@{/main/list(category=COSMETIC)}">Cosmetic</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 사이드 바 끝-->
+
+                <div class="col-lg-9 col-md-8 col-12">
+                    <div class="shop product-info">
+						<div class="container">
+							<div class="col-12">
+                        <!-- productsUpdate 시작 -->
+                                <div class="write-form">
+                                    <!-- Form -->
+                                    <form class="form" id="updateForm" method="post" th:action="@{/main/productsUpdateProc}">
+                                        <table>
+                                            <div class="row">
+                                                <tr>
+                                                    <th class="form-group"><h6>Category<span>*</span></th>
+                                                    <td>
+                                                        <select name="category" class="category">
+                                                            <option value="FOOD_BEVERAGE" th:selected="${product.category.name()} == 'FOOD_BEVERAGE'">Food & Beverage</option>
+                                                            <option value="CHEMICAL" th:selected="${product.category.name()} == 'CHEMICAL'">Chemical</option>
+                                                            <option value="HEALTH_MEDICAL" th:selected="${product.category.name()} == 'HEALTH_MEDICAL'">Health & Medical</option>
+                                                            <option value="ELECTRONIC" th:selected="${product.category.name()}=='ELECTRONIC'">Electronics</option>
+                                                            <option value="COSMETIC" th:selected="${product.category.name()} == 'COSMETIC'">Cosmetic</option>
+                                                        </select> 
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="form-group"><h6>Product Name<span>*</span></h6></th>
+                                                    <td><input type="text" name="productName" th:value="${product.productName}"></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <!-- 원산지 -->
+                                                    <th class="form-group"><h6>Origin<span>*</span></h6></th>
+                                                    <td><input type="text" class="origin" id="origin" name="origin" th:value="${product.origin}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <!-- 가격 과 단위 처리 어떻게 할지 물어보기 -->
+                                                    <!-- 가격 & 단위 -->
+                                                    <th class="form-group"><h6>Price<span>*</span></h6></th>
+                                                    <td>
+                                                        $ <input type="text" class="price" id="price" name="price" th:value="${product.price}">
+                                                    </td>
+                                                </tr>
+                                                <!-- 최소 주문 수량 -->
+                                                <tr>
+                                                    <th class="form-group"><h6>Quantity<span>*</span></h6></th>
+                                                    <td>
+                                                        <input type="text" class="moq" id="moq" name="moq" th:value="${product.moq}">
+                                                        <input type="hidden" class="unit" id="unit" name="unit" th:value="${product.unit}">
+                                                        <p style="margin-left: 23px;">Minimum Order</p>
+                                                </tr>
+                                                <!-- / 무역 정보 작성 -->
+
+                                                <!-- 상품 정보 작성 -->
+                                                <tr>
+                                                    <th colspan="2" class="form-group editor"><h6>Product Details<span>*</span></h6></th>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <div name="editor" id="ckeditor" ></div>
+                                                    </td>
+                                                </tr>
+                                                <!-- / 상품 정보 작성 -->
+                                                
+                                                <input type="hidden" id="productDesc"  name="productDesc">
+                                                <input type="hidden" name="productId" th:value="${product.productId}">
+                                                <input type="hidden" name="customerId" th:value="${product.customerId}">
+                                            </div>
+                                        </table>
+                                        <div class="col-12">
+                                            <div class=" form-group submit-btn">
+                                                <button class="btn" id="submitBtn" type="button">Submit</button>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                    <!--/ End Form -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </sesction>
+    <!--/ End update -->
+    <div style="height: 50px;"></div>
+
+        <!-- Start Footer Area -->
+        <footer class="footer">
+            <!-- Footer Top -->
+            <div class="footer-top section">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-2 col-md-6 col-12">
+                            <!-- Single Widget -->
+                            <div class="single-footer links">
+                                <h4>About Us</h4>
+                                <ul>
+                                    <li><a href="#">Company Overview</a></li>
+                                    <li><a href="#">Agent Program</a></li>
+                                    <li><a href="#">Advertise with us</a></li>
+                                </ul>
+                            </div>
+                            <!-- End Single Widget -->
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-12">
+                            <!-- Single Widget -->
+                            <div class="single-footer links">
+                                <h4>Buying on EC21</h4>
+                                <ul>
+                                    <li><a href="#">Post Buying Leads</a></li>
+                                    <li><a href="#">Browse Category</a></li>
+                                    <li><a href="#">Products by Keywords</a></li>
+                                    <li><a href="#">Products by Country</a></li>
+                                    <li><a href="#">Idea Products</a></li>
+                                </ul>
+                            </div>
+                            <!-- End Single Widget -->
+                        </div>
+
+                        <!-- Single Widget -->
+                        <div class="col-lg-2 col-md-6 col-12">
+                            <!-- Single Widget -->
+                            <div class="single-footer links">
+                                <h4>Selling on EC21</h4>
+                                <ul>
+                                    <li><a href="#">Post Products</a></li>
+                                    <li><a href="#">Manage Products</a></li>
+                                    <li><a href="#">Post Selling Leads</a></li>
+                                    <li><a href="#">Search Buying Leads</a></li>
+                                    <li><a href="#">Search Buyer Data</a></li>
+                                </ul>
+                            </div>
+                            <!-- End Single Widget -->
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-12">
+                            <!-- Single Widget -->
+                            <div class="single-footer links">
+                                <h4>Services</h4>
+                                <ul>
+                                    <li><a href="#">Basic Services</a></li>
+                                    <li><a href="#">Trade PRO</a></li>
+                                    <li><a href="#">Trade OK</a></li>
+                                    <li><a href="#">Credit Reports</a></li>
+                                    <li><a href="#">TradeVerify</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- End Single Widget -->
+                        <div class="col-lg-3 col-md-6 col-12">
+                            <!-- Single Widget -->
+                            <div class="single-footer social">
+                                <h4>Share this page</h4>
+                                <ul>
+                                    <li><a href="#"><i class="ti-facebook"></i></a></li>
+                                    <li><a href="#"><i class="ti-twitter"></i></a></li>
+                                    <li><a href="#"><i class="ti-flickr"></i></a></li>
+                                    <li><a href="#"><i class="ti-instagram"></i></a></li>
+                                </ul>
+                            </div>
+                            <!-- End Single Widget -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Footer Top -->
+            <div class="copyright">
+                <div class="container">
+                    <div class="inner">
+                        <div class="row">
+                            <div class="col-lg-6 col-12">
+                                <div class="left">
+                                    <p>Copyright © 1997-2024 <a href="#" target="_blank">EC21 Inc.</a> All Rights
+                                        Reserved. EC21 in Korean | Chinese Business Registry Number: 120-86-03931</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-12">
+                                <div class="right">
+                                    <img th:src="@{/main/images/payments.png}" alt="#">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- /End Footer Area -->
+
+
+        <!-- Jquery -->
+        <script th:src="@{/main/js/jquery.min.js}"></script>
+        <script th:src="@{/main/js/jquery-migrate-3.0.0.js}"></script>
+        <script th:src="@{/main/js/jquery-ui.min.js}"></script>
+        <!-- Popper JS -->
+        <script th:src="@{/main/js/popper.min.js}"></script>
+        <!-- Bootstrap JS -->
+        <script th:src="@{/main/js/bootstrap.min.js}"></script>
+        <!-- Color JS -->
+        <script th:src="@{/main/js/colors.js}"></script>
+        <!-- Slicknav JS -->
+        <script th:src="@{/main/js/slicknav.min.js}"></script>
+        <!-- Owl Carousel JS -->
+        <script th:src="@{/main/js/owl-carousel.js}"></script>
+        <!-- Magnific Popup JS -->
+        <script th:src="@{/main/js/magnific-popup.js}"></script>
+        <!-- Fancybox JS -->
+        <script th:src="@{/main/js/facnybox.min.js}"></script>
+        <!-- Waypoints JS -->
+        <script th:src="@{/main/js/waypoints.min.js}"></script>
+        <!-- Countdown JS -->
+        <script th:src="@{/main/js/finalcountdown.min.js}"></script>
+        <!-- Nice Select JS -->
+        <script th:src="@{/main/js/nicesellect.js}"></script>
+        <!-- Ytplayer JS -->
+        <script th:src="@{/main/js/ytplayer.min.js}"></script>
+        <!-- Flex Slider JS -->
+        <script th:src="@{/main/js/flex-slider.js}"></script>
+        <!-- ScrollUp JS -->
+        <script th:src="@{/main/js/scrollup.js}"></script>
+        <!-- Onepage Nav JS -->
+        <script th:src="@{/main/js/onepage-nav.min.js}"></script>
+        <!-- Easing JS -->
+        <script th:src="@{/main/js/easing.js}"></script>
+        <!-- Active JS -->
+        <script th:src="@{/main/js/active.js}"></script>
+        <!-- CK Editor -->
+        <script th:src="@{/main/js/ckEditor.js}"></script>
+</body>
+
+</html>

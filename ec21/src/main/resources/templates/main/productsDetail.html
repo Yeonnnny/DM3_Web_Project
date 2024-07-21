@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- Meta Tag -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name='copyright' content=''>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Title Tag  -->
+	<title>EC21, Global B2B Marketplace</title>
+
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" th:href="@{/main/images/ec21logo.png}">
+	<!-- Web Font -->
+	<link
+		href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+		rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+	<!-- StyleSheet -->
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" th:href="@{/main/css/bootstrap.css}">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" th:href="@{/main/css/magnific-popup.min.css}">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" th:href="@{/main/css/font-awesome.css}">
+	<!-- Fancybox -->
+	<link rel="stylesheet" th:href="@{/main/css/fancybox.css}">
+	<!-- Themify Icons -->
+	<link rel="stylesheet" th:href="@{/main/css/themify-icons.css}">
+	<!-- Nice Select CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/niceselect.css}">
+	<!-- Animate CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/animate.css}">
+	<!-- Flex Slider CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/flex-slider.min.css}">
+	<!-- Owl Carousel -->
+	<link rel="stylesheet" th:href="@{/main/css/owl-carousel.css}">
+	<!-- Slicknav -->
+	<link rel="stylesheet" th:href="@{/main/css/slicknav.min.css}">
+
+	<!-- Eshop StyleSheet -->
+	<link rel="stylesheet" th:href="@{/main/css/reset.css}">
+	<link rel="stylesheet" th:href="@{/main/css/style.css}">
+	<link rel="stylesheet" th:href="@{/main/css/responsive.css}">
+
+	<!-- Color CSS -->
+	<link rel="stylesheet" th:href="@{/main/css/color/color2.css}">
+
+	<link rel="stylesheet" href="" id="colors">
+
+
+	<!-- 240417 dy : JQuery 파일 추가 및 ajax 작업 -->
+	<script th:src="@{/script/jquery-3.7.1.min.js}"></script>
+
+
+	<!-- 240417 dy : 검색어 입력 후 돋보기 클릭 시 /main/list 요청-->
+	<script>
+		
+		$(function () {
+			// 인콰이어리 모달 변수 초기화
+			var modal = $("#inquiryModal");
+
+			// 닫기 버튼 이벤트
+			$("#closeBtn").on("click", function (event) {
+				modal.hide();
+			});
+
+			// 모달 백그라운드 클릭 이벤트
+			$(window).on("click", function (event) {
+				if ($(event.target).is(modal)) {
+					modal.hide();
+				}
+			});
+
+			// 로그인하기 전 모달창 클릭시
+			$("#AnonymousClickModalBtn").on("click", function () {
+				alert("This service is available when you log in.");
+			});
+
+
+			// 로그인한 후 모달창 클릭시, 모달창 값 채우기 & 모달창 열기
+			$("#modalBtn").on("click", function () {
+				let productId = $(this).attr("data-id");
+				let receiver = $(this).attr("data-seller");
+				let sender = $("#loginUser").val();
+				let prefixedTitle = $(this).attr("data-title");
+				let inquiryTitle = "Regard " + prefixedTitle;
+				// let inquiryTitle = $(this).attr("data-title");
+				let prefixedCategory = $(this).attr("data-category");
+				// _를 &로 변경
+				let category = prefixedCategory.replace(/_/g, "&");
+				// let category = $(this).attr("data-category");
+				let quantity = $(this).attr("data-quantity");
+				let unit = $(this).attr("data-unit");
+				console.log(receiver);
+
+				// 모달 값 채우기
+				$("#modalReceiverId").val(receiver);
+				$("#modalSenderId").val(sender);
+				$("#modalProductId").val(productId);
+				$("#modalTitle").val(inquiryTitle);
+				$("#modalCategory").val(category);
+				$("#modalQuantity").val(quantity);
+				$("#modalQuantity").attr("min", quantity); 	// 최소 수량 
+				$("#modalUnit").text(unit);				    // 단위
+				$("#submitBtn").on("click", submitInquiry);
+				// 모달열기
+				// $("#inquiryModal").modal();
+
+			}); // End 모달 클릭 이벤트
+
+			$("#searchBtn").on("click", search);
+			getInboxCount();
+		});
+
+		function search() {
+			let category = $("#category").val();
+			let searchWord = $("#searchWord").val();
+
+			$.ajax({
+				url: "/main/list",
+				data: { "category": category, "searchWord": searchWord },
+				method: "GET"
+			})
+		}
+
+		// 인콰이어리 개수 반환
+		function getInboxCount() {
+			let customerId = $("#customerId").val();
+			// customerId가 anonymousUser가 아닌 경우 요청 보냄!! 
+			if (customerId !== "anonymousUser") { 
+				$.ajax({
+					url: "/main/index/getInboxCount",
+					data: { "customerId": customerId },
+					method: "GET",
+					success: function (resp) {
+						console.log(resp);
+						$("#iboxCount").text(resp);
+					}
+				});
+			}
+		}
+
+
+		// 인콰이어리 post로 보내기
+		function submitInquiry() {
+			if (confirm("The inquiry has been sent.")) {
+				$("#inquiryForm").submit();
+			}
+		}
+
+		function deleteProduct(element, event) {
+			let productId = element.getAttribute("data-product");
+			if (confirm("Are you sure you want to delete?")) {
+				$.ajax({
+					url: "/main/productsDelete",
+					data: { "productId": productId },
+					success: function (resp) {
+						if (resp) {
+							alert("The post has been deleted.");
+							return true;
+						}
+					}
+				});
+			}
+		}
+
+		// 스크롤 시 드롭다운 닫기
+		document.addEventListener("scroll", function () {
+			// 현재 스크롤 위치를 감지
+			var scrollPosition = window.scrollY; // 또는 window.pageYOffset
+
+			// 스크롤 위치가 특정 픽셀 수 이상인 경우
+			var threshold = 200; // 원하는 스크롤 길이
+			if (scrollPosition > threshold) {
+				// 모든 열려 있는 드롭다운 메뉴를 닫기
+				var dropdowns = document.querySelectorAll(".dropdown-menu.show");
+				dropdowns.forEach(function (dropdown) {
+					if (dropdown.classList.contains("show")) {
+						// 'show' 클래스 제거
+						dropdown.classList.remove("show");
+					}
+				});
+			}
+		});
+
+	</script>
+
+</head>
+
+<body class="js">
+	<input type="hidden" name="" id="loginUser" th:value="${#authentication.name}">
+	<input type="hidden" name="" id="customerId" th:value="${#authentication.name}">
+	<!-- 지우지.. 마시오.. css 다 사라짐요.. -->
+	<!-- Preloader -->
+	<!-- <div class="preloader">
+		<div class="preloader-inner">
+			<div class="preloader-icon">
+				<span></span>
+				<span></span>
+			</div>
+		</div>
+	</div> -->
+	<!-- End Preloader -->
+
+	<!-- Header -->
+	<header class="header shop">
+		<!-- Topbar -->
+		<div class="topbar">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-4 col-md-12 col-12">
+						<!-- Top Left -->
+						<div class="top-left">
+						</div>
+						<!--/ End Top Left -->
+					</div>
+					<div class="col-lg-8 col-md-12 col-12">
+						<!-- Top Right -->
+						<div class="right-content">
+							<ul class="list-main">
+								<li sec:authorize="isAnonymous()"><i class="ti-power-off"></i><a
+										th:href="@{/main/login}">Login</a></li>
+								<li sec:authorize="isAnonymous()"><i class="ti-user"></i><a
+										th:href="@{/main/register}">Sign up</a></li>
+								<li sec:authorize="isAuthenticated()"><i class="ti-power-off"></i><a
+										th:href="@{/main/logout}">Logout</a></li>
+							</ul>
+						</div>
+						<!-- End Top Right -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Topbar -->
+		<div class="middle-inner">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-2 col-md-2 col-12">
+						<!-- Logo -->
+						<div class="logo">
+							<a th:href="@{/}"><img th:src="@{/main/images/ec21logo.png}" alt="logo"></a>
+						</div>
+						<!--/ End Logo -->
+						<!-- Search Form -->
+						<div class="search-top">
+							<!-- 클릭하면 자바스크립트 함수로 해서 검색어 설정하게 하기 -->
+							<div class="top-search"><a href=""><i class="ti-search"></i></a></div>
+							<!-- Search Form -->
+							<div class="search-top">
+								<input type="text" placeholder="Search here..." name="search">
+								<button value="search" type="submit"><i class="ti-search"></i></button>
+							</div>
+							<!--/ End Search Form -->
+						</div>
+						<!--/ End Search Form -->
+						<div class="mobile-nav"></div>
+					</div>
+					<div class="col-lg-8 col-md-7 col-12">
+						<form th:action="@{/main/list}" method="get">
+							<div class="search-bar-top">
+								<div class="search-bar">
+									<!-- 240420 dy : 카테고리 선택 & 검색어 입력 시 form 태그로 상품 리스트로의 요청 걸어줌 -->
+									<select id="category" name="category">
+										<option value="total" th:selected="${category eq 'total'}">All Category</option>
+										<option value="FOOD_BEVERAGE" th:selected="${category eq 'FOOD_BEVERAGE'}">Food
+											& Beverage</option>
+										<option value="CHEMICAL" th:selected="${category eq 'CHEMICAL'}">Chemical
+										</option>
+										<option value="HEALTH_MEDICAL" th:selected="${category eq 'HEALTH_MEDICAL'}">
+											Health & Medical</option>
+										<option value="ELECTRONIC" th:selected="${category eq 'ELECTRONIC'}">Electronics
+										</option>
+										<option value="COSMETIC" th:selected="${category eq 'COSMETIC'}">Cosmetic
+										</option>
+									</select>
+									<input id="searchWord" name="searchWord" placeholder="What are you searching for?"
+										type="text" th:value="${searchWord}"
+										th:attr="placeholder=${searchWord eq null ? 'What are you searching for?' : null}">
+									<button type="submit" class="btnn"> <i class="ti-search"></i></button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-lg-2 col-md-3 col-12">
+						<div class="right-bar">
+							<!-- Search Form -->
+							<div class="sinlge-bar">
+								<a th:href="@{/main/myproducts(customerId=${#authentication.name})}"
+									class="single-icon">
+									<i class="fa fa-user-circle-o" aria-hidden="true"></i>
+								</a>
+							</div>
+
+							<!-- 검색창 옆 부분 인콰이어리 new 로만 보이게 하고 인콰이어리 페이지로 넘어가게 하기 -->
+							<div class="sinlge-bar inquiry">
+								<a th:href="@{/main/inbox(customerId=${#authentication.name})}" class="single-icon">
+									<i class="fa fa-envelope-o"></i>
+									<span sec:authorize="isAuthenticated()" class="total-count" id="iboxCount"></span>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Header Inner -->
+		<div class="header-inner">
+			<div class="container">
+				<div class="cat-nav-head">
+					<div class="row">
+					</div>
+					<div class="col-lg-9 col-12">
+						<div class="menu-area">
+
+							<!-- Main Menu -->
+							<nav class="navbar navbar-expand-lg">
+								<div class="navbar-collapse">
+									<div class="nav-inner">
+										<!-- 240417 dy : 카테고리 별 상품 목록 요청(검색어X) -->
+										<ul class="nav main-menu menu navbar-nav">
+											<li><a th:href="@{/main/list(category=total)}">All</a></li>
+											<li><a th:href="@{/main/list(category=FOOD_BEVERAGE)}">Food & Beverage</a>
+											</li>
+											<li><a th:href="@{/main/list(category=CHEMICAL)}">Chemical</a></li>
+											<li><a th:href="@{/main/list(category=HEALTH_MEDICAL)}">Health & Medical</a>
+											</li>
+											<li><a th:href="@{/main/list(category=ELECTRONIC)}">Electronics</a></li>
+											<li><a th:href="@{/main/list(category=COSMETIC)}">Cosmetic</a></li>
+										</ul>
+									</div>
+								</div>
+							</nav>
+							<!--/ End Main Menu -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		<!--/ End Header Inner -->
+	</header>
+	<!--/ End Header -->
+
+	<!-- Breadcrumbs -->
+	<div class="breadcrumbs">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<div class="bread-inner">
+						<ul class="bread-list">
+							<li><a th:href="@{/}">Home<i class="ti-arrow-right"></i></a></li>
+							<li class="active"><a th:href="@{/main/list}">Products<i class="ti-arrow-right"></i></a>
+							</li>
+							<li class="active"><a
+									th:href="@{/main/list(category=${product.category})}">[[${product.category.name().replace('_',
+									'&')}]]<i class="ti-arrow-right"></i></a></li>
+							<li class="active"><a
+									th:href="@{/main/productsDetail(productId=${product.productId})}">[[${product.productName}]]</a>
+							</li>
+							<!-- 상품명은 th로 넣기 -->
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Breadcrumbs -->
+
+	<!-- Shop Single Section -->
+	<section class="shop single section" style="min-height: 100vh;">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<!-- Product Edit & Delete Buttons for User and Manager -->
+					<!-- 240426 dy : 상품 판매자와 로그인한 ID가 동일한 경우에만 버튼 보임 -->
+					<!-- <div class="btn-edit" th:if="${product.customerId == #authentication.name}">
+						<a class="" href="#"><i class="fa fa-cog"></i></a>
+						<ul class="user-custom ">
+							<li><a th:href="@{/main/productsUpdate(productId=${product.productId})}"
+									class="btn min user">Edit</a></li>
+							<li>
+								<th:block th:if="${currentPage eq 'myproducts'}">
+									<a onclick="return deleteProduct(this,event)"
+										th:href="@{/main/myproducts/afterDelete(customerId=${product.customerId},category=${category}, searchWord=${searchWord})}"
+										class="btn min user" id="deleteBtn"
+										th:data-product="${product.productId}">Delete</a>
+							</li>
+							</th:block>
+							<th:block th:unless="${currentPage eq 'myproducts'}">
+								<a onclick="return deleteProduct(this,event)"
+									th:href="@{/main/list/afterDelete(category=${category}, searchWord=${searchWord})}"
+									class="btn min user" id="deleteBtn"
+									th:data-product="${product.productId}">Delete</a>
+							</th:block>
+							</li>
+						</ul>
+					</div> -->
+					<!-- 드롭다운 버튼 -->
+					<div class="for-user" th:if="${product.customerId == #authentication.name}">
+						<a class="dropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false">
+							<i class="fa fa-cog"></i> <!-- 아이콘 -->
+						</a>
+						<!-- 드롭다운 메뉴 -->
+						<ul class="dropdown-menu dropdown-custom">
+							<!-- 'Edit' 링크 -->
+							<li>
+								<a th:href="@{/main/productsUpdate(productId=${product.productId})}"
+									class="dropdown-link">Edit</a>
+							</li>
+							<!-- 'Delete' 링크, 현재 페이지가 'myproducts'일 경우 -->
+							<li>
+								<th:block th:if="${currentPage eq 'myproducts'}">
+									<a onclick="return deleteProduct(this,event)"
+										th:href="@{/main/myproducts/afterDelete(customerId=${product.customerId},category=${category}, searchWord=${searchWord})}"
+										id="deleteBtn" th:data-product="${product.productId}">Delete</a>
+							</li>
+							<!-- 'Delete' 링크, 현재 페이지가 'myproducts'가 아닐 경우 -->
+							</th:block>
+							<th:block th:unless="${currentPage eq 'myproducts'}">
+								<a onclick="return deleteProduct(this,event)"
+									th:href="@{/main/list/afterDelete(category=${category}, searchWord=${searchWord})}"
+									id="deleteBtn" th:data-product="${product.productId}">Delete</a>
+							</th:block>
+							</li>
+						</ul>
+					</div>
+
+					<!-- Product Gallery : 조원들이랑 상의 할 곳 -->
+					<div class="row">
+						<div class="col-lg-6 col-12">
+							<div class="product-gallery">
+								<div class="flexslider-thumbnails">
+									<span th:if="${product.originalFileName}!=null">
+										<img th:src="@{/main/downloadImg(productId=${product.productId})}">
+									</span>
+									<span th:unless="${product.originalFileName}!=null">
+										<img src="https://via.placeholder.com/550x750" alt="">
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Product Description -->
+						<div class="col-lg-6 col-12">
+							<div class="product-desc">
+								<div class="short">
+									<h4 th:text="${product.productName}">Automotive Micro Relay JTKW</h4>
+									<h6 class="price">Price : <span>$[[${product.price}]]</span></h6>
+									<h6 class="origin">Origin :
+										<span class="country-name">[[${product.origin}]]</span>
+										<span class="flag-container"></span>
+									</h6>
+									<h6 class="quantity">Minimum Order Quantity : <span>[[${product.moq}]]
+											[[${product.unit}]]</span></h6>
+								</div>
+
+								<!-- Inquiry Button -->
+								<!-- 240426 dy : 판매자와 로그인한 아이디가 동일하지 않은 경우에만 보이게 -->
+								<div class="add-to-cart" th:if="${product.customerId != #authentication.name}">
+									<!-- 240529 dy : 로그인하지 않은 경우 -->
+									<button sec:authorize="isAnonymous()" class="btn" id="AnonymousClickModalBtn">
+										Inquire Now <i class="fa fa-envelope-o"></i>
+									</button>
+									<!-- 240529 dy : 로그인한 경우 -->
+									<button sec:authorize="isAuthenticated()" class="btn" th:id="modalBtn" data-toggle="modal" data-target="#inquiryModal"
+										th:data-quantity="${product.moq}" th:data-unit="${product.unit}"
+										th:data-id="${product.productId}" th:data-category="${product.category}"
+										th:data-seller="${product.customerId}" th:data-title="${product.productName}">
+										Inquire Now <i class="fa fa-envelope-o"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Inquiry Modal -->
+					<div class="modal fade" id="inquiryModal" tabindex="-1" role="dialog"
+						aria-labelledby="exampleModalLabel" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<form class="form" th:action="@{/productDetail/sendInquiry}" method="post"
+									id="inquiryForm" enctype="multipart/form-data">
+									<!-- Modal Header -->
+									<div class="modal-header">
+										<div class="modal-title">
+											<span>SENDING</span>
+										</div>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<!-- Modal Body -->
+									<div class="modal-body">
+										<p>
+											<i class="ti-user"></i> Reminder for Buyers
+											<br>Be cautious with
+											pre-payment by T/T or Western Union. Do not make pre-payment to any sellers
+											unless you can fully trust the sellers.
+											<!-- <br> More... EC21.com is NOT RESPONSIBLE for transactions between buyers and
+											sellers. -->
+										</p>
+										<table>
+											<tr>
+												<th class="col-md-5 to">To</th>
+												<td><input name="receiverId" id="modalReceiverId" readonly></td>
+											</tr>
+											<tr>
+												<th class="">Subject <span>*</span></th>
+												<td><input type="text" name="inquiryTitle" id="modalTitle" required>
+												</td>
+											</tr>
+											<tr>
+												<th class="">Category <span>*</span></th>
+												<td><input type="text" name="" id="modalCategory" required></td>
+											</tr>
+											<tr>
+												<th class="">Quantity <span>*</span></th>
+												<td><input type="number" name="quantity" id="modalQuantity" required>
+													(<span id="modalUnit"></span>) </td>
+											</tr>
+											<tr>
+												<th colspan="2">Message <span>*</span></th>
+											</tr>
+											<tr>
+												<td colspan="2" >
+													<textarea class="message-field" name="inquiryContent"
+														id="modalContent" cols="30" rows="10" required></textarea>
+												</td>
+											</tr>
+											<tr>
+												<th class="">Attach File</th>
+												<td><input type="file" name="uploadFile" id="modalFile"
+														value="Upload File"></td>
+											</tr>
+											<tr>
+												<td class="agree-check" colspan="2">
+													<input type="checkbox" name="termsAgreement" required> I Agree To
+													EC21 Terms of Services, Privacy Policy, And Receive Emails From EC21
+													And Its Partners Related To Their Services, Promotions And Business
+													Matching.
+												</td>
+											</tr>
+											<input type="hidden" name="senderId" id="modalSenderId">
+											<input type="hidden" name="productId" id="modalProductId">
+										</table>
+									</div>
+									<!-- Modal Footer -->
+									<div class="modal-footer">
+										<button type="button" id="submitBtn" class="btn">Send</button>
+										<button type="button" id="closeBtn" class="btn"
+											data-dismiss="modal">Close</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Additional Info -->
+				<div class="col-11">
+					<div class="product-info">
+						<div class="nav-main">
+							<!-- Tab Nav -->
+							<div class="nav nav-tabs" id="myTab" role="tablist">
+								<a class="nav-link active" data-toggle="tab" role="tab">Description by Manufacturer</a>
+							</div>
+							<!-- Tab Content -->
+							<div class="tab-content" id="myTabContent">
+								<div class="tab-single">
+									<div class="row">
+										<div class="col-12">
+											<div class="single-des">
+												<div class="comp-info">
+													<table>
+														<tr>
+															<th class="comp-name"
+																th:text="'About ' + ${customer.compName} + '..'"
+																colspan="2">company name</th>
+														</tr>
+														<tr>
+															<th class="country">country</th>
+															<td class="seller-country" th:text="${customer.country}">
+																<span id="seller-flag"></span>
+															</td>
+														</tr>
+														<tr>
+															<th>description</th>
+															<td th:text="${customer.compDesc}">디지털마스터</td>
+														</tr>
+
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="tab-single">
+									<div class="row">
+										<div class="col-12">
+											<div class="single-des">
+												<span class="productDesc" th:utext="${product.productDesc}">
+													LoremIpsum dummy text.
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- /Tab Content -->
+						</div>
+					</div>
+				</div>
+				<!-- /Additional Info -->
+			</div>
+		</div>
+	</section>
+	<!-- End Shop Single Section -->
+
+
+
+	<!-- Start Most Popular -->
+	<div class="product-area most-popular related-product section">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<div class="section-title">
+						<h2>Same Category Products</h2>
+					</div>
+				</div>
+			</div>
+			<!-- 이 부분은 비어 보이길래 해당 카테 고리 안에 최근순으로 넣으면 됩니다 : 네엡!-->
+			<!-- 240417 dy : 해당 상품과 동일한 카테고리에 해당하는 상품 top5 꽂아넣기!-->
+			<div class="row">
+				<div class="col-12">
+					<div class="owl-carousel popular-slider" id="result">
+						<!-- Start Single Product -->
+						<div class="single-product" th:each="dto:${list}">
+							<div class="product-img">
+								<a th:href="@{/main/productsDetail(productId=${dto.productId})}">
+									<span th:if="${dto.originalFileName}!=null">
+										<img th:src="@{/main/downloadImg(productId=${dto.productId})}">
+									</span>
+									<span th:unless="${dto.originalFileName}!=null">
+										<img class="default-img" src="https://via.placeholder.com/550x750">
+									</span>
+								</a>
+							</div>
+
+							<div class="product-content">
+								<h3>
+									<a th:href="@{/main/productsDetail(productId=${dto.productId})}">[[${dto.productName}]]</a>
+								</h3>
+								<div class="product-price">
+									<span>$ [[${dto.price}]]</span>
+								</div>
+								<div class="product-seller" th:data-country="${product.country}" th:data-productid="${product.productId}">
+									<img class="countryFlag" src="" alt="" style="width:20px; height:20px;">
+									<span>[[${dto.customerId}]]</span>
+								</div>
+							</div>
+						</div>
+						<!-- End Single Product -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Most Popular Area -->
+
+	<div style="height: 50px;"></div>
+	<!-- 여기에 50px 높이의 공간이 추가됩니다 -->
+
+	<!-- Start Footer Area -->
+	<footer class="footer">
+		<!-- Footer Top -->
+		<div class="footer-top section">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>About Us</h4>
+							<ul>
+								<li><a href="#">Company Overview</a></li>
+								<li><a href="#">Agent Program</a></li>
+								<li><a href="#">Advertise with us</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Buying on EC21</h4>
+							<ul>
+								<li><a href="#">Post Buying Leads</a></li>
+								<li><a href="#">Browse Category</a></li>
+								<li><a href="#">Products by Keywords</a></li>
+								<li><a href="#">Products by Country</a></li>
+								<li><a href="#">Idea Products</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+
+					<!-- Single Widget -->
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Selling on EC21</h4>
+							<ul>
+								<li><a href="#">Post Products</a></li>
+								<li><a href="#">Manage Products</a></li>
+								<li><a href="#">Post Selling Leads</a></li>
+								<li><a href="#">Search Buying Leads</a></li>
+								<li><a href="#">Search Buyer Data</a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+					<div class="col-lg-2 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer links">
+							<h4>Services</h4>
+							<ul>
+								<li><a href="#">Basic Services</a></li>
+								<li><a href="#">Trade PRO</a></li>
+								<li><a href="#">Trade OK</a></li>
+								<li><a href="#">Credit Reports</a></li>
+								<li><a href="#">TradeVerify</a></li>
+							</ul>
+						</div>
+					</div>
+					<!-- End Single Widget -->
+					<div class="col-lg-3 col-md-6 col-12">
+						<!-- Single Widget -->
+						<div class="single-footer social">
+							<h4>Share this page</h4>
+							<ul>
+								<li><a href="#"><i class="ti-facebook"></i></a></li>
+								<li><a href="#"><i class="ti-twitter"></i></a></li>
+								<li><a href="#"><i class="ti-flickr"></i></a></li>
+								<li><a href="#"><i class="ti-instagram"></i></a></li>
+							</ul>
+						</div>
+						<!-- End Single Widget -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Footer Top -->
+		<div class="copyright">
+			<div class="container">
+				<div class="inner">
+					<div class="row">
+						<div class="col-lg-6 col-12">
+							<div class="left">
+								<p>Copyright © 1997-2024 <a href="https://www.ec21.com/" target="_blank">EC21 Inc.</a>
+									All Rights Reserved. EC21 in Korean | Chinese Business Registry Number: 120-86-03931
+								</p>
+							</div>
+						</div>
+						<div class="col-lg-6 col-12">
+							<div class="right">
+								<img th:src="@{/main/images/payments.png}" alt="#">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- /End Footer Area -->
+
+	<!-- Bootstrap 모달 -->
+	<div class="modal fade" id="loginAlertModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Login Required</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					You will be redirected to the login page.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" id="redirectLoginBtn">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Jquery -->
+	<!-- <script th:src="@{/script/jquery-3.7.1.min.js}"></script> -->
+	<!-- <script th:src="@{/main/js/jquery.min.js}"></script> -->
+	<script th:src="@{/main/js/jquery-migrate-3.0.0.js}"></script>
+	<script th:src="@{/main/js/jquery-ui.min.js}"></script>
+
+	<!-- modal -->
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Popper JS -->
+	<script th:src="@{/main/js/popper.min.js}"></script>
+	<!-- Bootstrap JS -->
+	<!-- <script th:src="@{/main/js/bootstrap.min.js}"></script> -->
+	<!-- Color JS -->
+	<script th:src="@{/main/js/colors.js}"></script>
+	<!-- Slicknav JS -->
+	<script th:src="@{/main/js/slicknav.min.js}"></script>
+	<!-- Owl Carousel JS -->
+	<script th:src="@{/main/js/owl-carousel.js}"></script>
+	<!-- Magnific Popup JS -->
+	<script th:src="@{/main/js/magnific-popup.js}"></script>
+	<!-- Fancybox JS -->
+	<script th:src="@{/main/js/fancybox.min.js}"></script>
+	<!-- Waypoints JS -->
+	<script th:src="@{/main/js/waypoints.min.js}"></script>
+	<!-- Countdown JS -->
+	<script th:src="@{/main/js/finalcountdown.min.js}"></script>
+	<!-- Nice Select JS -->
+	<script th:src="@{/main/js/nicesellect.js}"></script>
+	<!-- Ytplayer JS -->
+	<!-- <script th:src="@{/main/js/ytplayer.min.js}"></script> -->
+	<!-- Flex Slider JS -->
+	<script th:src="@{/main/js/flex-slider.js}"></script>
+	<!-- ScrollUp JS -->
+	<script th:src="@{/main/js/scrollup.js}"></script>
+	<!-- Onepage Nav JS -->
+	<script th:src="@{/main/js/onepage-nav.min.js}"></script>
+	<!-- Easing JS -->
+	<script th:src="@{/main/js/easing.js}"></script>
+	<!-- Active JS -->
+	<script th:src="@{/main/js/active.js}"></script>
+	<!-- myFunction JS : 필요한 자바 스크립트 이리로 넣어서 사용하면 됩니다 -->
+	<script th:src="@{/main/js/myFunction.js}"></script>
+
+</body>
+
+</html>
